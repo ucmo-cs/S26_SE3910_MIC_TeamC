@@ -9,6 +9,7 @@ import {
   ListItemText,
   Typography,
   Box,
+  Button,
 } from "@mui/material";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import RequestQuoteOutlinedIcon from "@mui/icons-material/RequestQuoteOutlined";
@@ -54,7 +55,6 @@ export const Step1SelectReason: React.FC<Step1Props> = ({ onNext }) => {
 
   const handleSelectReason = (reason: string) => {
     updateFormData({ reason });
-    onNext();
   };
 
   return (
@@ -168,6 +168,29 @@ export const Step1SelectReason: React.FC<Step1Props> = ({ onNext }) => {
             </ListItem>
           ))}
         </List>
+
+        {/* Buttons */}
+        <Box
+          sx={{
+            marginTop: 3,
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={onNext}
+            disabled={!formData.reason}
+            sx={{
+              textTransform: "none",
+              fontWeight: 700,
+              borderRadius: 2.5,
+              px: 3,
+            }}
+          >
+            Continue
+          </Button>
+        </Box>
       </CardContent>
     </Card>
   );
