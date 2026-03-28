@@ -7,16 +7,16 @@ import java.util.UUID;
  * DTO returned after a successful booking. Use UUID for ids to match entities.
  */
 public class AppointmentResponse {
-    private UUID id;
+    private Long id;
     private UUID userId;
     private UUID branchTopicId;
     private String startTime; // ISO-8601
     private String message;
 
-    public AppointmentResponse () {
+    public AppointmentResponse() {
     }
 
-    public AppointmentResponse (UUID id, UUID userId, UUID branchTopicId, String startTime, String message) {
+    public AppointmentResponse(Long id, UUID userId, UUID branchTopicId, String startTime, String message) {
         this.id = id;
         this.userId = userId;
         this.branchTopicId = branchTopicId;
@@ -24,43 +24,43 @@ public class AppointmentResponse {
         this.message = message;
     }
 
-    public UUID getId () {
+    public Long getId() {
         return id;
     }
 
-    public void setId (UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public UUID getUserId () {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId (UUID userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 
-    public UUID getBranchTopicId () {
+    public UUID getBranchTopicId() {
         return branchTopicId;
     }
 
-    public void setBranchTopicId (UUID branchTopicId) {
+    public void setBranchTopicId(UUID branchTopicId) {
         this.branchTopicId = branchTopicId;
     }
 
-    public String getStartTime () {
+    public String getStartTime() {
         return startTime;
     }
 
-    public void setStartTime (String startTime) {
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
 
-    public String getMessage () {
+    public String getMessage() {
         return message;
     }
 
-    public void setMessage (String message) {
+    public void setMessage(String message) {
         this.message = message;
     }
 }

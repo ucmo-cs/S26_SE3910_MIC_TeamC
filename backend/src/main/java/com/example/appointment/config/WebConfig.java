@@ -16,7 +16,7 @@ import java.util.List;
 @Configuration
 public class WebConfig {
     @Bean
-    public CorsFilter corsFilter () {
+    public CorsFilter corsFilter() {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowCredentials(true);
         cfg.setAllowedOrigins(List.of("http://localhost:3000"));

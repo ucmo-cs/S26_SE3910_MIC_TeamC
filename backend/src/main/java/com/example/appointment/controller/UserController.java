@@ -1,18 +1,16 @@
 // Licensed under the MIT License
 package com.example.appointment.controller;
 
-import com.example.appointment.dto.CreateUserRequest;
 import com.example.appointment.model.User;
 import com.example.appointment.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.util.List;
 
 /**
- * REST controller for user management.
+ * REST controller for users.
  */
 @RestController
 @RequestMapping("/api/users")
@@ -20,53 +18,37 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController (UserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser (@Valid @RequestBody CreateUserRequest request) {
-        User user = userService.create(request);
-        UserDto dto = new UserDto(user.getId(), user.getName(), user.getEmail());
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    public ResponseEntity<User> create(@RequestBody User user) {
+        User saved = userService.create(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    /**
-     * Simple DTO for user response.
-     */
-    public static class UserDto {
-        private UUID id;
-        private String name;
-        private String email;
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getById(@PathVariable Long id) {
+        return userService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
 
-        public UserDto (UUID id, String name, String email) {
-            this.id = id;
-            this.name = name;
-            this.email = email;
-        }
+    @GetMapping
+    public ResponseEntity<List<User>> getAll() {
+        List<User> users = userService.findAll();
+        return ResponseEntity.ok(users);
+    }
 
-        public UUID getId () {
-            return id;
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
+        user.setId(id);
+        User updated = userService.update(user);
+        return ResponseEntity.ok(updated);
+    }
 
-        public void setId (UUID id) {
-            this.id = id;
-        }
-
-        public String getName () {
-            return name;
-        }
-
-        public void setName (String name) {
-            this.name = name;
-        }
-
-        public String getEmail () {
-            return email;
-        }
-
-        public void setEmail (String email) {
-            this.email = email;
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        userService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

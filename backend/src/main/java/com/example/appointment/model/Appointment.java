@@ -2,20 +2,16 @@
 package com.example.appointment.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "appointments")
 public class Appointment {
 
     @Id
-    @GeneratedValue
-    @UuidGenerator
-    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -28,38 +24,78 @@ public class Appointment {
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
-    public Appointment () {
+    @Column(name = "reason", length = 500)
+    private String reason;
+
+    public Appointment() {
     }
 
-    public UUID getId () {
+    public Appointment(Long id, User user, BranchTopic branchTopic, LocalDateTime startTime, String reason) {
+        this.id = id;
+        this.user = user;
+        this.branchTopic = branchTopic;
+        this.startTime = startTime;
+        this.reason = reason;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId (UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public User getUser () {
+    public User getUser() {
         return user;
     }
 
-    public void setUser (User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
-    public BranchTopic getBranchTopic () {
+    public BranchTopic getBranchTopic() {
         return branchTopic;
     }
 
-    public void setBranchTopic (BranchTopic branchTopic) {
+    public void setBranchTopic(BranchTopic branchTopic) {
         this.branchTopic = branchTopic;
     }
 
-    public LocalDateTime getStartTime () {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime (LocalDateTime startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if ( ! (o instanceof Appointment))
+            return false;
+        Appointment that = (Appointment) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Appointment{" + "id=" + id + ", user=" + user + ", branchTopic=" + branchTopic + ", startTime="
+                + startTime + ", reason='" + reason + '\'' + '}';
     }
 }

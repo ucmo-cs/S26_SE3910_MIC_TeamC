@@ -1,25 +1,16 @@
 // Licensed under the MIT License
 package com.example.appointment.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.UUID;
-
-import com.example.appointment.dto.AppointmentRequest;
-import com.example.appointment.dto.AppointmentResponse;
-import com.example.appointment.dto.CreateAppointmentRequest;
 import com.example.appointment.model.Appointment;
 import com.example.appointment.model.Branch;
 import com.example.appointment.model.BranchTopic;
 import com.example.appointment.model.Topic;
 import com.example.appointment.model.User;
+import com.example.appointment.repository.AppointmentRepository;
 import com.example.appointment.repository.BranchRepository;
 import com.example.appointment.repository.BranchTopicRepository;
 import com.example.appointment.repository.TopicRepository;
-import com.example.appointment.service.impl.AppointmentServiceImpl;
-import com.example.appointment.service.impl.UserServiceImpl;
+import com.example.appointment.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,121 +18,108 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-/**
- * Unit tests for AppointmentService.
- */
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @DataJpaTest
-@Import({
-        AppointmentServiceImpl.class,
-        UserServiceImpl.class})
-@DisplayName("AppointmentService Tests")
+@Import(AppointmentService.class)
+@DisplayName("AppointmentService (CRUD) Tests")
 class AppointmentServiceTest {
 
     @Autowired
-    private BranchTopicRepository branchTopicRepository;
+    private AppointmentService appointmentService;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
     @Autowired
     private BranchRepository branchRepository;
+
     @Autowired
     private TopicRepository topicRepository;
+
     @Autowired
-    private com.example.appointment.service.UserService userService;
+    private BranchTopicRepository branchTopicRepository;
+
     @Autowired
-    private AppointmentService appointmentService;
+    private UserRepository userRepository;
 
     private User testUser;
     private BranchTopic testBranchTopic;
-    private Appointment testAppointment;
-    private CreateAppointmentRequest testCreateRequest;
-    private AppointmentRequest testLegacyRequest;
+    private Appointment appointment;
 
     @BeforeEach
-    void setUp () {
-        // Create and save Branch
-        Branch branch = new Branch();
-        branch.setName("Test Branch");
-        branchRepository.save(branch);
+    void setUp() {
+        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
+        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        testBranchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
+        testUser = userRepository.save(new User(null, "Test User", "test@example.com"));
 
-        // Create and save Topic
-        Topic topic = new Topic();
-        topic.setName("Test Topic");
-        topicRepository.save(topic);
-
-        // Create and save BranchTopic
-        testBranchTopic = new BranchTopic();
-        testBranchTopic.setBranch(branch);
-        testBranchTopic.setTopic(topic);
-        branchTopicRepository.save(testBranchTopic);
-
-        // Create and save User
-        testUser = userService.findOrCreate("John Doe", "john@example.com");
-
-        testAppointment = new Appointment();
-        testAppointment.setId(UUID.fromString("00000000-0000-0000-0000-000000000003"));
-        testAppointment.setUser(testUser);
-        testAppointment.setBranchTopic(testBranchTopic);
-        testAppointment.setStartTime(java.time.LocalDateTime.parse("2023-10-01T10:00:00"));
-
-        testCreateRequest = new CreateAppointmentRequest();
-        testCreateRequest.setUserId(testUser.getId());
-        testCreateRequest.setBranchTopicId(testBranchTopic.getId());
-        testCreateRequest.setStartTime("2023-10-01T10:00:00");
-        testCreateRequest.setReason("Test reason");
-
-        testLegacyRequest = new AppointmentRequest();
-        testLegacyRequest.setName("John Doe");
-        testLegacyRequest.setEmail("john@example.com");
-        testLegacyRequest.setBranch(testBranchTopic.getId().toString());
-        testLegacyRequest.setTimeslot("2023-10-01T10:00:00");
-        testLegacyRequest.setReason("Test reason");
+        appointment = new Appointment();
+        appointment.setUser(testUser);
+        appointment.setBranchTopic(testBranchTopic);
+        appointment.setStartTime(LocalDateTime.parse("2023-10-01T10:00:00"));
+        appointment.setReason("Test reason");
     }
 
     @Test
-    @DisplayName("Should book appointment successfully with CreateAppointmentRequest")
-    void testBookAppointmentWithCreateRequest () {
-        // Act
-        AppointmentResponse response = appointmentService.bookAppointment(testCreateRequest);
+    void create_and_find_by_id() {
+        Appointment saved = appointmentService.create(appointment);
 
-        // Assert
-        assertNotNull(response);
-        assertNotNull(response.getId());
-        assertEquals(testUser.getId(), response.getUserId());
-        assertEquals(testBranchTopic.getId(), response.getBranchTopicId());
-        assertEquals("2023-10-01T10:00", response.getStartTime());
-        assertEquals("Booked", response.getMessage());
+        assertThat(saved.getId()).isNotNull();
+
+        Appointment found = appointmentService.findById(saved.getId()).orElseThrow();
+        assertThat(found.getUser().getId()).isEqualTo(appointment.getUser().getId());
+        assertThat(found.getBranchTopic().getId()).isEqualTo(appointment.getBranchTopic().getId());
     }
 
     @Test
-    @DisplayName("Should book appointment successfully with legacy AppointmentRequest")
-    void testBookAppointmentWithLegacyRequest () {
-        // Act
-        AppointmentResponse response = appointmentService.bookAppointment(testLegacyRequest);
+    void find_all_returns_list() {
+        appointmentService.create(appointment);
+        List<Appointment> appointments = appointmentService.findAll();
 
-        // Assert
-        assertNotNull(response);
-        assertNotNull(response.getId());
+        assertThat(appointments).hasSize(1);
     }
 
     @Test
-    @DisplayName("Should throw exception when timeslot is already booked")
-    void testBookAppointmentTimeslotUnavailable () {
-        // First, book the appointment
-        appointmentService.bookAppointment(testCreateRequest);
+    void duplicate_timeslot_is_rejected() {
+        appointmentService.create(appointment);
 
-        // Now, try to book again
-        // Act & Assert
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            appointmentService.bookAppointment(testCreateRequest);
-        });
-        assertEquals("Time slot already booked", exception.getMessage());
+        User secondUser = userRepository.save(new User(null, "Second User", "second@example.com"));
+        Appointment second = new Appointment();
+        second.setUser(secondUser);
+        second.setBranchTopic(testBranchTopic);
+        second.setStartTime(appointment.getStartTime());
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> appointmentService.create(second));
+        assertThat(ex.getMessage()).isEqualTo("Time slot already booked");
     }
 
     @Test
-    @DisplayName("Should throw exception for getAvailableTimeslots")
-    void testGetAvailableTimeslots () {
-        // Act & Assert
-        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () -> {
-            appointmentService.getAvailableTimeslots("test");
-        });
-        assertEquals("Implement timeslot lookup in AppointmentServiceImpl", exception.getMessage());
+    void update_appointment() {
+        Appointment saved = appointmentService.create(appointment);
+
+        Appointment updateRequest = new Appointment();
+        updateRequest.setId(saved.getId());
+        updateRequest.setUser(testUser);
+        updateRequest.setBranchTopic(testBranchTopic);
+        updateRequest.setStartTime(LocalDateTime.parse("2023-10-01T11:00:00"));
+        updateRequest.setReason("Updated reason");
+
+        Appointment updated = appointmentService.update(updateRequest);
+
+        assertThat(updated.getStartTime()).isEqualTo(LocalDateTime.parse("2023-10-01T11:00:00"));
+        assertThat(updated.getReason()).isEqualTo("Updated reason");
+    }
+
+    @Test
+    void delete_by_id() {
+        Appointment saved = appointmentService.create(appointment);
+
+        appointmentService.deleteById(saved.getId());
+        assertThat(appointmentService.findById(saved.getId())).isEmpty();
     }
 }

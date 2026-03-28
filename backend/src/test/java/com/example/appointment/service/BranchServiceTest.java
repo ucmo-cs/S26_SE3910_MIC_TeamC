@@ -7,11 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import com.example.appointment.model.Branch;
 import com.example.appointment.repository.BranchRepository;
-import com.example.appointment.service.impl.BranchServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +21,7 @@ import org.springframework.context.annotation.Import;
  * Unit tests for BranchService.
  */
 @DataJpaTest
-@Import(BranchServiceImpl.class)
+@Import(BranchService.class)
 @DisplayName("BranchService Tests")
 class BranchServiceTest {
 
@@ -37,22 +35,17 @@ class BranchServiceTest {
     private Branch testBranch2;
 
     @BeforeEach
-    void setUp () {
-        testBranch1 = new Branch();
-        testBranch1.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
-        testBranch1.setName("Branch One");
+    void setUp() {
+        testBranch1 = new Branch(null, "Branch One");
+        testBranch1 = branchRepository.save(testBranch1);
 
-        testBranch2 = new Branch();
-        testBranch2.setId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
-        testBranch2.setName("Branch Two");
-
-        branchRepository.save(testBranch1);
-        branchRepository.save(testBranch2);
+        testBranch2 = new Branch(null, "Branch Two");
+        testBranch2 = branchRepository.save(testBranch2);
     }
 
     @Test
     @DisplayName("Should find branch by ID successfully")
-    void testFindById () {
+    void testFindById() {
         // Act
         Optional<Branch> foundBranch = branchService.findById(testBranch1.getId());
 
@@ -65,30 +58,30 @@ class BranchServiceTest {
 
     @Test
     @DisplayName("Should find branch by name successfully")
-    void testFindByName () {
+    void testFindByName() {
         // Act
-        Optional<Branch> foundBranch = branchService.findByName("Branch One");
+        List<Branch> foundBranches = branchService.findByName("Branch One");
 
         // Assert
-        assertNotNull(foundBranch);
-        assertTrue(foundBranch.isPresent());
-        assertEquals("Branch One", foundBranch.get().getName());
+        assertNotNull(foundBranches);
+        assertEquals(1, foundBranches.size());
+        assertEquals("Branch One", foundBranches.get(0).getName());
     }
 
     @Test
     @DisplayName("Should return empty when branch by name not found")
-    void testFindByNameNotFound () {
+    void testFindByNameNotFound() {
         // Act
-        Optional<Branch> foundBranch = branchService.findByName("Nonexistent");
+        List<Branch> foundBranches = branchService.findByName("Nonexistent");
 
         // Assert
-        assertNotNull(foundBranch);
-        assertTrue(foundBranch.isEmpty());
+        assertNotNull(foundBranches);
+        assertEquals(0, foundBranches.size());
     }
 
     @Test
     @DisplayName("Should find all branches successfully")
-    void testFindAll () {
+    void testFindAll() {
         // Act
         List<Branch> foundBranches = branchService.findAll();
 

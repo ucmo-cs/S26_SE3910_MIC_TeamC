@@ -5,12 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import com.example.appointment.model.Topic;
 import com.example.appointment.repository.TopicRepository;
-import com.example.appointment.service.impl.TopicServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,7 @@ import org.springframework.context.annotation.Import;
  * Unit tests for TopicService.
  */
 @DataJpaTest
-@Import(TopicServiceImpl.class)
+@Import(TopicService.class)
 @DisplayName("TopicService Tests")
 class TopicServiceTest {
 
@@ -35,17 +34,14 @@ class TopicServiceTest {
     private Topic testTopic;
 
     @BeforeEach
-    void setUp () {
-        testTopic = new Topic();
-        testTopic.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
-        testTopic.setName("Test Topic");
-
-        topicRepository.save(testTopic);
+    void setUp() {
+        testTopic = new Topic(null, "Test Topic");
+        testTopic = topicRepository.save(testTopic);
     }
 
     @Test
     @DisplayName("Should find topic by ID successfully")
-    void testFindById () {
+    void testFindById() {
         // Act
         Optional<Topic> foundTopic = topicService.findById(testTopic.getId());
 
@@ -54,5 +50,29 @@ class TopicServiceTest {
         assertTrue(foundTopic.isPresent());
         assertEquals(testTopic.getId(), foundTopic.get().getId());
         assertEquals("Test Topic", foundTopic.get().getName());
+    }
+
+    @Test
+    @DisplayName("Should find all topics successfully")
+    void testFindAll() {
+        // Act
+        List<Topic> foundTopics = topicService.findAll();
+
+        // Assert
+        assertNotNull(foundTopics);
+        assertEquals(1, foundTopics.size());
+        assertEquals("Test Topic", foundTopics.get(0).getName());
+    }
+
+    @Test
+    @DisplayName("Should find topic by name successfully")
+    void testFindByName() {
+        // Act
+        List<Topic> foundTopics = topicService.findByName("Test Topic");
+
+        // Assert
+        assertNotNull(foundTopics);
+        assertEquals(1, foundTopics.size());
+        assertEquals("Test Topic", foundTopics.get(0).getName());
     }
 }

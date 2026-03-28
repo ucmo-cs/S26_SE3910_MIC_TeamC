@@ -1,0 +1,108 @@
+// Licensed under the MIT License
+package com.example.appointment.repository;
+
+import com.example.appointment.model.Branch;
+import com.example.appointment.model.BranchTopic;
+import com.example.appointment.model.Topic;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import java.util.List;
+import java.util.Optional;
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
+class BranchTopicRepositoryTest {
+
+    @Autowired
+    private BranchRepository branchRepository;
+
+    @Autowired
+    private TopicRepository topicRepository;
+
+    @Autowired
+    private BranchTopicRepository branchTopicRepository;
+
+    @Test
+    void save_entity() {
+        // given
+        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
+        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        BranchTopic entity = new BranchTopic(null, branch, topic);
+
+        // when
+        BranchTopic saved = branchTopicRepository.save(entity);
+
+        // then
+        assertThat(saved.getId()).isNotNull();
+        assertThat(saved.getBranch().getName()).isEqualTo("Test Branch");
+        assertThat(saved.getTopic().getName()).isEqualTo("Test Topic");
+    }
+
+    @Test
+    void findById_returns_correct_entity() {
+        // given
+        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
+        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        BranchTopic entity = new BranchTopic(null, branch, topic);
+        BranchTopic saved = branchTopicRepository.save(entity);
+
+        // when
+        Optional<BranchTopic> found = branchTopicRepository.findById(saved.getId());
+
+        // then
+        assertThat(found).isPresent();
+        assertThat(found.get().getBranch().getName()).isEqualTo("Test Branch");
+    }
+
+    @Test
+    void findAll_returns_all_entities() {
+        // given
+        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
+        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        branchTopicRepository.save(new BranchTopic(null, branch, topic));
+        branchTopicRepository.save(new BranchTopic(null, branch, topic));
+
+        // when
+        List<BranchTopic> entities = branchTopicRepository.findAll();
+
+        // then
+        assertThat(entities).hasSize(2);
+    }
+
+    @Test
+    void findByBranchId_returns_matching_entities() {
+        // given
+        Branch branch1 = branchRepository.save(new Branch(null, "Branch1"));
+        Branch branch2 = branchRepository.save(new Branch(null, "Branch2"));
+        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        branchTopicRepository.save(new BranchTopic(null, branch1, topic));
+        branchTopicRepository.save(new BranchTopic(null, branch2, topic));
+
+        // when
+        List<BranchTopic> found = branchTopicRepository.findByBranchId(branch1.getId());
+
+        // then
+        assertThat(found).hasSize(1);
+        assertThat(found.get(0).getBranch().getId()).isEqualTo(branch1.getId());
+    }
+
+    @Test
+    void findByTopicId_returns_matching_entities() {
+        // given
+        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
+        Topic topic1 = topicRepository.save(new Topic(null, "Topic1"));
+        Topic topic2 = topicRepository.save(new Topic(null, "Topic2"));
+        branchTopicRepository.save(new BranchTopic(null, branch, topic1));
+        branchTopicRepository.save(new BranchTopic(null, branch, topic2));
+
+        // when
+        List<BranchTopic> found = branchTopicRepository.findByTopicId(topic1.getId());
+
+        // then
+        assertThat(found).hasSize(1);
+        assertThat(found.get(0).getTopic().getId()).isEqualTo(topic1.getId());
+    }
+
+    // Add more tests for custom methods
+}

@@ -6,12 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
-import java.util.UUID;
 
-import com.example.appointment.dto.CreateUserRequest;
 import com.example.appointment.model.User;
 import com.example.appointment.repository.UserRepository;
-import com.example.appointment.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +20,7 @@ import org.springframework.context.annotation.Import;
  * Unit tests for UserService.
  */
 @DataJpaTest
-@Import(UserServiceImpl.class)
+@Import(UserService.class)
 @DisplayName("UserService Tests")
 class UserServiceTest {
 
@@ -34,37 +31,29 @@ class UserServiceTest {
     private UserService userService;
 
     private User testUser;
-    private CreateUserRequest testRequest;
 
     @BeforeEach
-    void setUp () {
-        testUser = new User();
-        testUser.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
-        testUser.setName("John Doe");
-        testUser.setEmail("john@example.com");
-
-        userRepository.save(testUser);
-
-        testRequest = new CreateUserRequest();
-        testRequest.setName("John Doe");
-        testRequest.setEmail("john@example.com");
+    void setUp() {
+        testUser = new User(null, "John Doe", "john@example.com");
+        testUser = userRepository.save(testUser);
     }
 
     @Test
     @DisplayName("Should save user successfully")
-    void testSaveUser () {
+    void testSaveUser() {
         // Act
-        User savedUser = userService.create(testRequest);
+        User newUser = new User(null, "Jane Doe", "jane@example.com");
+        User savedUser = userService.create(newUser);
 
         // Assert
         assertNotNull(savedUser);
-        assertEquals("John Doe", savedUser.getName());
-        assertEquals("john@example.com", savedUser.getEmail());
+        assertEquals("Jane Doe", savedUser.getName());
+        assertEquals("jane@example.com", savedUser.getEmail());
     }
 
     @Test
     @DisplayName("Should retrieve user by ID successfully")
-    void testGetUserById () {
+    void testGetUserById() {
         // Act
         Optional<User> foundUser = userService.findById(testUser.getId());
 
@@ -77,7 +66,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Should find existing user by email in findOrCreate")
-    void testFindOrCreateExistingUser () {
+    void testFindOrCreateExistingUser() {
         // Act
         User foundUser = userService.findOrCreate("John Doe", "john@example.com");
 
@@ -90,7 +79,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Should create new user in findOrCreate when not found")
-    void testFindOrCreateNewUser () {
+    void testFindOrCreateNewUser() {
         // Act
         User createdUser = userService.findOrCreate("Jane Doe", "jane@example.com");
 

@@ -43,12 +43,12 @@
 		<setting id="org.eclipse.jdt.core.formatter.insert_space_before_colon_in_default" value="insert" />
 		<setting id="org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_parenthesized_expression" value="do not insert" />
 		<setting id="org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_if" value="do not insert" />
-		<setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_method_declaration" value="insert" />
+		<setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_method_declaration" value="do not insert" />
 		<setting id="org.eclipse.jdt.core.formatter.insert_space_after_colon_in_assert" value="insert" />
 		<setting id="org.eclipse.jdt.core.formatter.compact_else_if" value="true" />
 		<setting id="org.eclipse.jdt.core.formatter.insert_space_before_comma_in_annotation" value="do not insert" />
 		<setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_method_invocation_arguments" value="insert" />
-		<setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_constructor_declaration" value="insert" />
+		<setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_constructor_declaration" value="do not insert" />
 		<setting id="org.eclipse.jdt.core.formatter.insert_space_before_comma_in_array_initializer" value="do not insert" />
 		<setting id="org.eclipse.jdt.core.formatter.number_of_blank_lines_to_preserve" value="1" />
 		<setting id="org.eclipse.jdt.core.formatter.insert_new_line_before_closing_brace" value="insert" />

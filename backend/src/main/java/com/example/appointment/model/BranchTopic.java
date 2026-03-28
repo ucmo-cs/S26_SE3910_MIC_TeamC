@@ -2,21 +2,18 @@
 package com.example.appointment.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "branch_topics")
 public class BranchTopic {
 
     @Id
-    @GeneratedValue
-    @UuidGenerator
-    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false, nullable = false)
+    private Long id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "branch_id", nullable = false)
@@ -29,38 +26,64 @@ public class BranchTopic {
     @OneToMany(mappedBy = "branchTopic", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Appointment> appointments = new HashSet<>();
 
-    public BranchTopic () {
+    public BranchTopic() {
     }
 
-    public UUID getId () {
-        return id;
-    }
-
-    public void setId (UUID id) {
+    public BranchTopic(Long id, Branch branch, Topic topic) {
         this.id = id;
-    }
-
-    public Branch getBranch () {
-        return branch;
-    }
-
-    public void setBranch (Branch branch) {
         this.branch = branch;
-    }
-
-    public Topic getTopic () {
-        return topic;
-    }
-
-    public void setTopic (Topic topic) {
         this.topic = topic;
     }
 
-    public Set<Appointment> getAppointments () {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Branch getBranch() {
+        return branch;
+    }
+
+    public void setBranch(Branch branch) {
+        this.branch = branch;
+    }
+
+    public Topic getTopic() {
+        return topic;
+    }
+
+    public void setTopic(Topic topic) {
+        this.topic = topic;
+    }
+
+    public Set<Appointment> getAppointments() {
         return appointments;
     }
 
-    public void setAppointments (Set<Appointment> appointments) {
+    public void setAppointments(Set<Appointment> appointments) {
         this.appointments = appointments;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        BranchTopic that = (BranchTopic) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "BranchTopic{" + "id=" + id + ", branch=" + branch + ", topic=" + topic + '}';
     }
 }

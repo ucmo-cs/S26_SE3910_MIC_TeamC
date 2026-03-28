@@ -7,27 +7,27 @@ public class TopicResponse {
     private UUID id;
     private String name;
 
-    public TopicResponse () {
+    public TopicResponse() {
     }
 
-    public TopicResponse (UUID id, String name) {
+    public TopicResponse(UUID id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public UUID getId () {
+    public UUID getId() {
         return id;
     }
 
-    public void setId (UUID id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public String getName () {
+    public String getName() {
         return name;
     }
 
-    public void setName (String name) {
+    public void setName(String name) {
         this.name = name;
     }
 }

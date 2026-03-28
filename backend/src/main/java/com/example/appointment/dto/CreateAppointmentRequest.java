@@ -24,38 +24,35 @@ public class CreateAppointmentRequest {
     @Size(max = 500)
     private String reason;
 
-    public CreateAppointmentRequest () {
-    }
-
-    public UUID getUserId () {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId (UUID userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 
-    public UUID getBranchTopicId () {
+    public UUID getBranchTopicId() {
         return branchTopicId;
     }
 
-    public void setBranchTopicId (UUID branchTopicId) {
+    public void setBranchTopicId(UUID branchTopicId) {
         this.branchTopicId = branchTopicId;
     }
 
-    public String getStartTime () {
+    public String getStartTime() {
         return startTime;
     }
 
-    public void setStartTime (String startTime) {
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
 
-    public String getReason () {
+    public String getReason() {
         return reason;
     }
 
-    public void setReason (String reason) {
+    public void setReason(String reason) {
         this.reason = reason;
     }
 }
