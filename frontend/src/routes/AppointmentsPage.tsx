@@ -89,6 +89,7 @@ export const AppointmentsPage: React.FC = () => {
         email: apt.user.email,
         phone: apt.phoneNumber,
         location: apt.branchTopic.branch.name,
+        topic: apt.branchTopic.topic.name,
         reason: apt.reason,
         date: apt.startTime.split("T")[0],
                                              time: apt.startTime.split("T")[1],
@@ -149,6 +150,9 @@ export const AppointmentsPage: React.FC = () => {
       <strong>Name</strong>
       </TableCell>
       <TableCell>
+      <strong>Topic</strong>
+      </TableCell>
+      <TableCell>
       <strong>Reason</strong>
       </TableCell>
       <TableCell>
@@ -172,6 +176,7 @@ export const AppointmentsPage: React.FC = () => {
       {appointments.map((apt: Appointment) => (
         <TableRow key={apt.id}>
         <TableCell>{apt.name}</TableCell>
+        <TableCell>{apt.topic}</TableCell>
         <TableCell>{apt.reason}</TableCell>
         <TableCell>{apt.location}</TableCell>
         <TableCell>{formatDateTime(apt.date, apt.time)}</TableCell>
