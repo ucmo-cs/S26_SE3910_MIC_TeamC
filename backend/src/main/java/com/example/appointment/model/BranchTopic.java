@@ -1,7 +1,6 @@
 // Licensed under the MIT License
 package com.example.appointment.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
@@ -24,7 +23,6 @@ public class BranchTopic {
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "branchTopic", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Appointment> appointments = new HashSet<>();
 

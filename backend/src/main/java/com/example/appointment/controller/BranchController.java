@@ -2,7 +2,6 @@
 package com.example.appointment.controller;
 
 import com.example.appointment.model.Branch;
-import com.example.appointment.model.BranchTopic;
 import com.example.appointment.model.Topic;
 import com.example.appointment.service.BranchService;
 import com.example.appointment.service.BranchTopicService;
@@ -62,12 +61,5 @@ public class BranchController {
 
         List<Topic> topics = branchTopicService.findByBranchId(branchId).stream().map(bt -> bt.getTopic()).toList();
         return ResponseEntity.ok(topics);
-    }
-
-    @GetMapping("/{branchId}/branch-topics")
-    public ResponseEntity<List<BranchTopic>> getBranchTopicsForBranch(@PathVariable Long branchId) {
-        branchService.findById(branchId).orElseThrow(() -> new IllegalArgumentException("Branch not found"));
-        List<BranchTopic> branchTopics = branchTopicService.findByBranchId(branchId);
-        return ResponseEntity.ok(branchTopics);
     }
 }
