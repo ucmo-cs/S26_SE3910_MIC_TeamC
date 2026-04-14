@@ -25,22 +25,22 @@ export const TopBar: React.FC = () => {
     setAnchorEl(null);
   };
 
-  const handleScheduleAppointment = () => {
-    navigate({ to: "/schedule/step1" });
-    handleMenuClose();
-  };
-
-  const handleListAppointments = () => {
-    navigate({ to: "/appointments" });
-    handleMenuClose();
-  };
-
   const handleHomeClick = () => {
     navigate({ to: "/" });
     handleMenuClose();
   };
 
-  const handleLoginClick = () => {
+  const handleSchedule = () => {
+    navigate({ to: "/schedule/step1" });
+    handleMenuClose();
+  };
+
+  const handleAppointments = () => {
+    navigate({ to: "/appointments" });
+    handleMenuClose();
+  };
+
+  const handleLogin = () => {
     navigate({ to: "/login" });
     handleMenuClose();
   };
@@ -69,10 +69,8 @@ export const TopBar: React.FC = () => {
           <Box>
             <Typography
               variant="h6"
-              component="div"
               sx={{
                 fontWeight: 700,
-                fontSize: { xs: "1.2rem", md: "1.4rem" },
                 color: "white",
                 lineHeight: 1.1,
               }}
@@ -92,15 +90,13 @@ export const TopBar: React.FC = () => {
           </Box>
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           <Button
             onClick={handleHomeClick}
             color="inherit"
             sx={{
               textTransform: "none",
               fontWeight: 600,
-              borderRadius: 2,
-              px: 2,
               "&:hover": {
                 backgroundColor: "rgba(255,255,255,0.12)",
               },
@@ -110,19 +106,16 @@ export const TopBar: React.FC = () => {
           </Button>
 
           <Button
-            onClick={handleLoginClick}
-            variant="contained"
+            onClick={handleLogin}
+            color="inherit"
             sx={{
               textTransform: "none",
-              fontWeight: 700,
+              fontWeight: 600,
+              border: "1px solid rgba(255,255,255,0.4)",
               borderRadius: 2,
-              px: 2.5,
-              backgroundColor: "white",
-              color: "#1565c0",
-              boxShadow: "none",
+              px: 2,
               "&:hover": {
-                backgroundColor: "#f4f7fb",
-                boxShadow: "none",
+                backgroundColor: "rgba(255,255,255,0.12)",
               },
             }}
           >
@@ -130,18 +123,12 @@ export const TopBar: React.FC = () => {
           </Button>
 
           <Button
-            id="basic-button"
-            aria-controls={open ? "basic-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
             onClick={handleMenuOpen}
             color="inherit"
             startIcon={<MenuIcon />}
             sx={{
               textTransform: "none",
               fontWeight: 600,
-              borderRadius: 2,
-              px: 2,
               "&:hover": {
                 backgroundColor: "rgba(255,255,255,0.12)",
               },
@@ -152,13 +139,9 @@ export const TopBar: React.FC = () => {
         </Box>
 
         <Menu
-          id="basic-menu"
           anchorEl={anchorEl}
           open={open}
           onClose={handleMenuClose}
-          MenuListProps={{
-            "aria-labelledby": "basic-button",
-          }}
           PaperProps={{
             elevation: 4,
             sx: {
@@ -170,13 +153,12 @@ export const TopBar: React.FC = () => {
           }}
         >
           <MenuItem onClick={handleHomeClick}>Home</MenuItem>
-          <MenuItem onClick={handleScheduleAppointment}>
-            Schedule an Appointment
+          <MenuItem onClick={handleSchedule}>
+            Schedule Appointment
           </MenuItem>
-          <MenuItem onClick={handleListAppointments}>
-            List All Appointments
+          <MenuItem onClick={handleAppointments}>
+            View Appointments
           </MenuItem>
-          <MenuItem onClick={handleLoginClick}>Login</MenuItem>
         </Menu>
       </Toolbar>
     </AppBar>

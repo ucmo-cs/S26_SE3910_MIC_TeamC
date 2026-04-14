@@ -49,9 +49,14 @@ const Login = () => {
   const handleLogin = () => {
     if (validate()) {
       setLoading(true);
+
       setTimeout(() => {
         setLoading(false);
-        alert(`Welcome back, ${email}`);
+
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", email);
+
+        window.location.href = "/home";
       }, 1000);
     }
   };
@@ -85,7 +90,14 @@ const Login = () => {
           },
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
           <Box
             sx={{
               width: 64,
