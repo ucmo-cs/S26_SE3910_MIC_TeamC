@@ -3,7 +3,6 @@ import { TopBar } from "./components/TopBar";
 import { HomePage } from "./routes/HomePage";
 import { SchedulePage } from "./routes/SchedulePage";
 import { AppointmentsPage } from "./routes/AppointmentsPage";
-import Login from "./pages/Login";
 
 const RootComponent = () => {
   return (
@@ -53,12 +52,6 @@ const appointmentsRoute = new Route({
   component: AppointmentsPage,
 });
 
-const loginRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "/login",
-  component: Login,
-});
-
 const scheduleWildcardRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/schedule/$step",
@@ -70,7 +63,6 @@ const routeTree = rootRoute.addChildren([
   scheduleRoute,
   scheduleWildcardRoute,
   appointmentsRoute,
-  loginRoute,
 ]);
 
 export const router = new Router({ routeTree });

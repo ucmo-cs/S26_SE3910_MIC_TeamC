@@ -40,11 +40,6 @@ export const TopBar: React.FC = () => {
     handleMenuClose();
   };
 
-  const handleLogin = () => {
-    navigate({ to: "/login" });
-    handleMenuClose();
-  };
-
   return (
     <AppBar
       position="static"
@@ -106,23 +101,6 @@ export const TopBar: React.FC = () => {
           </Button>
 
           <Button
-            onClick={handleLogin}
-            color="inherit"
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              border: "1px solid rgba(255,255,255,0.4)",
-              borderRadius: 2,
-              px: 2,
-              "&:hover": {
-                backgroundColor: "rgba(255,255,255,0.12)",
-              },
-            }}
-          >
-            Login
-          </Button>
-
-          <Button
             onClick={handleMenuOpen}
             color="inherit"
             startIcon={<MenuIcon />}
@@ -153,12 +131,8 @@ export const TopBar: React.FC = () => {
           }}
         >
           <MenuItem onClick={handleHomeClick}>Home</MenuItem>
-          <MenuItem onClick={handleSchedule}>
-            Schedule Appointment
-          </MenuItem>
-          <MenuItem onClick={handleAppointments}>
-            View Appointments
-          </MenuItem>
+          <MenuItem onClick={handleSchedule}>Schedule Appointment</MenuItem>
+          <MenuItem onClick={handleAppointments}>View Appointments</MenuItem>
         </Menu>
       </Toolbar>
     </AppBar>
