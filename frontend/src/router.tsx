@@ -52,7 +52,6 @@ const appointmentsRoute = new Route({
   component: AppointmentsPage,
 });
 
-// Wildcard route for /schedule paths
 const scheduleWildcardRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/schedule/$step",
