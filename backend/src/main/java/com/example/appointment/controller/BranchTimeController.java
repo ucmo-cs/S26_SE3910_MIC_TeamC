@@ -13,7 +13,6 @@ import java.util.List;
 /**
  * REST controller for branch times.
  * Supports filtering by branchId and/or day of week.
- *
  * Examples:
  *   GET /api/branchtimes                          — all records
  *   GET /api/branchtimes?branchId=1               — all times for branch 1
@@ -35,6 +34,12 @@ public class BranchTimeController {
     @PostMapping
     public ResponseEntity<BranchTime> create(@RequestBody BranchTime branchTime) {
         BranchTime saved = branchTimeService.create(branchTime);
+        return ResponseEntity.ok(saved);
+    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<List<BranchTime>> createBulk(@RequestBody List<BranchTime> branchTimes) {
+        List<BranchTime> saved = branchTimeService.createBulk(branchTimes);
         return ResponseEntity.ok(saved);
     }
 

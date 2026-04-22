@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -26,7 +27,20 @@ public class BranchTimeService {
                     .orElseThrow();
             branchTime.setBranch(branch);
         }
-        return repository.save(branchTime);
+
+        return repository
+                .findByBranchAndDayOfWeekAndAvailableTime(
+                        branchTime.getBranch(),
+                        branchTime.getDayOfWeek(),
+                        branchTime.getAvailableTime()
+                )
+                .orElseGet(() -> repository.save(branchTime));
+    }
+
+    public List<BranchTime> createBulk(List<BranchTime> branchTimes) {
+        return branchTimes.stream()
+                .map(this::create)
+                .collect(Collectors.toList());
     }
 
     public Optional<BranchTime> findById(Long id) {
