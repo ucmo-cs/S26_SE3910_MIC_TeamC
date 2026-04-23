@@ -8,8 +8,14 @@ import {
   Stack,
   Typography,
   Grid,
+  Divider,
+  Chip,
+  Paper,
   CircularProgress,
 } from "@mui/material";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
+import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -29,13 +35,15 @@ const formatTimeSlot = (time: string): string => {
 interface Step3Props {
   onNext: () => void;
   onPrev: () => void;
+  onDataChange: (data: any) => void;
 }
 
 export const Step3SelectDateTime: React.FC<Step3Props> = ({
   onNext,
   onPrev,
+  onDataChange,
 }) => {
-  const { formData, updateFormData } = useAppointment();
+  const { formData } = useAppointment();
 
   const parsed = dayjs(formData.startTime);
   const isValidDate = parsed.isValid();
@@ -50,15 +58,15 @@ export const Step3SelectDateTime: React.FC<Step3Props> = ({
   const [takenSlots, setTakenSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
 
-  // Fetch available slots for the selected date and branch
   useEffect(() => {
     if (!localDate) {
       setAvailableSlots([]);
+      setTakenSlots([]);
       return;
     }
 
-    const branchId = formData.branchId;
     const dateStr = localDate.format("YYYY-MM-DD");
+    const branchId = formData.branchId;
 
     setSlotsLoading(true);
 
@@ -74,6 +82,7 @@ export const Step3SelectDateTime: React.FC<Step3Props> = ({
     .then(async ([availableRes, takenRes]) => {
       if (!availableRes.ok) throw new Error("Failed to fetch available slots");
       if (!takenRes.ok) throw new Error("Failed to fetch taken slots");
+
       const availableData = await availableRes.json();
       const takenData: string[] = await takenRes.json();
 
@@ -94,29 +103,144 @@ export const Step3SelectDateTime: React.FC<Step3Props> = ({
 
   const handleNext = () => {
     if (!localDate || !localTime) return;
-
-    const combinedDateTime = dayjs(
-      `${localDate.format("YYYY-MM-DD")}T${localTime}`
-    ).format("YYYY-MM-DDTHH:mm:ss");
-
-    updateFormData({
-      startTime: combinedDateTime,
+    onDataChange({
       date: localDate.format("YYYY-MM-DD"),
-                   time: localTime,
+                 time: localTime,
+                 // startTime is auto-computed by context's updateFormData
     });
-
     onNext();
   };
 
+  const formattedSelectedDate = localDate
+  ? localDate.format("MMMM D, YYYY")
+  : "No date selected";
+
+  const formattedSelectedTime = localTime
+  ? formatTimeSlot(localTime)
+  : "No time selected";
+
   return (
-    <Card sx={{ maxWidth: 700, margin: "0 auto", marginTop: 4 }}>
-    <CardHeader title="Step 3: Select Date and Time" />
-    <CardContent>
-    <Stack spacing={3}>
+    <Card
+    sx={{
+      maxWidth: 760,
+      mx: "auto",
+      mt: 4,
+      borderRadius: 4,
+      border: "1px solid #E5E7EB",
+      boxShadow: "0 12px 32px rgba(15, 23, 42, 0.08)",
+          overflow: "hidden",
+    }}
+    >
+    <CardHeader
+    title={
+      <Box>
+      <Typography
+      variant="h5"
+      sx={{ fontWeight: 700, color: "#0F172A", mb: 0.5 }}
+      >
+      Step 3: Select Date and Time
+      </Typography>
+      <Typography variant="body2" sx={{ color: "#64748B" }}>
+      Choose the appointment date and an available time slot.
+      </Typography>
+      </Box>
+    }
+    sx={{
+      pb: 1,
+      background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
+    }}
+    />
+
+    <Divider />
+
+    <CardContent sx={{ p: { xs: 2.5, sm: 3.5 } }}>
+    <Stack spacing={3.5}>
+    {/* Current Selection Summary */}
+    <Paper
+    variant="outlined"
+    sx={{
+      p: 2,
+      borderRadius: 3,
+      borderColor: "#E2E8F0",
+      backgroundColor: "#F8FAFC",
+    }}
+    >
+    <Stack
+    direction={{ xs: "column", sm: "row" }}
+    spacing={1.5}
+    justifyContent="space-between"
+    alignItems={{ xs: "flex-start", sm: "center" }}
+    >
     <Box>
-    <Typography variant="subtitle1" sx={{ marginBottom: 2, fontWeight: 600 }}>
+    <Typography
+    variant="subtitle2"
+    sx={{
+      color: "#475569",
+      fontWeight: 700,
+      mb: 0.75,
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+    }}
+    >
+    Current Selection
+    </Typography>
+
+    <Stack direction={{ xs: "column", sm: "row" }} spacing={1} useFlexGap flexWrap="wrap">
+    <Chip
+    icon={<CalendarMonthOutlinedIcon />}
+    label={formattedSelectedDate}
+    sx={{
+      fontWeight: 600,
+      backgroundColor: "#FFFFFF",
+      border: "1px solid #E2E8F0",
+    }}
+    />
+    <Chip
+    icon={<AccessTimeOutlinedIcon />}
+    label={formattedSelectedTime}
+    sx={{
+      fontWeight: 600,
+      backgroundColor: "#FFFFFF",
+      border: "1px solid #E2E8F0",
+    }}
+    />
+    </Stack>
+    </Box>
+
+    {localDate && localTime && (
+      <Chip
+      icon={<EventAvailableOutlinedIcon />}
+      label="Ready to continue"
+      color="success"
+      variant="outlined"
+      sx={{ fontWeight: 700 }}
+      />
+    )}
+    </Stack>
+    </Paper>
+
+    {/* Date Selection */}
+    <Box>
+    <Typography
+    variant="subtitle1"
+    sx={{ mb: 1.5, fontWeight: 700, color: "#0F172A" }}
+    >
     Select Date
     </Typography>
+    <Typography variant="body2" sx={{ mb: 2, color: "#64748B" }}>
+    Pick a date starting from today.
+    </Typography>
+    <Paper
+    variant="outlined"
+    sx={{
+      p: 1.5,
+      borderRadius: 3,
+      borderColor: "#E2E8F0",
+      display: "flex",
+      justifyContent: "center",
+      backgroundColor: "#FFFFFF",
+    }}
+    >
     <LocalizationProvider dateAdapter={AdapterDayjs}>
     <DateCalendar
     value={localDate}
@@ -124,32 +248,55 @@ export const Step3SelectDateTime: React.FC<Step3Props> = ({
     minDate={dayjs()}
     />
     </LocalizationProvider>
+    </Paper>
     </Box>
 
+    {/* Time Selection */}
     <Box>
-    <Typography variant="subtitle1" sx={{ marginBottom: 2, fontWeight: 600 }}>
+    <Typography
+    variant="subtitle1"
+    sx={{ mb: 1.5, fontWeight: 700, color: "#0F172A" }}
+    >
     Select Time
     </Typography>
+    <Typography variant="body2" sx={{ mb: 2, color: "#64748B" }}>
+    Choose from the available appointment slots below.
+    </Typography>
+
     {!localDate ? (
-      <Typography color="textSecondary">Please select a date first.</Typography>
+      <Typography sx={{ color: "#64748B" }}>
+      Please select a date first.
+      </Typography>
     ) : slotsLoading ? (
       <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
       <CircularProgress size={28} />
       </Box>
     ) : availableSlots.length === 0 ? (
-      <Typography color="textSecondary">No available time slots for this day.</Typography>
+      <Typography sx={{ color: "#64748B" }}>
+      No available time slots for this day.
+      </Typography>
     ) : (
-      <Grid container spacing={1}>
+      <Grid container spacing={1.5}>
       {availableSlots.map((time) => {
+        const isSelected = localTime === time;
         const isTaken = takenSlots.includes(time);
+
         return (
-          <Grid item xs={6} sm={4} md={3} key={time}>
+          <Grid size={{ xs: 6, sm: 4, md: 3 }} key={time}>
           <Button
           fullWidth
-          variant={localTime === time ? "contained" : "outlined"}
+          variant={isSelected ? "contained" : "outlined"}
           onClick={() => setLocalTime(time)}
           disabled={isTaken}
-          sx={{ py: 1.5 }}
+          sx={{
+            py: 1.5,
+            borderRadius: 2.5,
+            fontWeight: 700,
+            textTransform: "none",
+            boxShadow: isSelected
+            ? "0 8px 20px rgba(25, 118, 210, 0.22)"
+            : "none",
+          }}
           >
           {formatTimeSlot(time)}
           </Button>
@@ -160,9 +307,45 @@ export const Step3SelectDateTime: React.FC<Step3Props> = ({
     )}
     </Box>
 
-    <Box sx={{ marginTop: 3, display: "flex", gap: 2, justifyContent: "flex-end" }}>
-    <Button variant="outlined" onClick={onPrev}>Back</Button>
-    <Button variant="contained" onClick={handleNext} disabled={!localDate || !localTime}>Next</Button>
+    {/* Action Buttons */}
+    <Box
+    sx={{
+      pt: 1,
+      display: "flex",
+      gap: 2,
+      justifyContent: "space-between",
+      flexDirection: { xs: "column-reverse", sm: "row" },
+    }}
+    >
+    <Button
+    variant="outlined"
+    onClick={onPrev}
+    sx={{
+      minWidth: 120,
+      py: 1.2,
+      borderRadius: 2.5,
+      fontWeight: 700,
+      textTransform: "none",
+    }}
+    >
+    Back
+    </Button>
+
+    <Button
+    variant="contained"
+    onClick={handleNext}
+    disabled={!localDate || !localTime}
+    sx={{
+      minWidth: 140,
+      py: 1.2,
+      borderRadius: 2.5,
+      fontWeight: 700,
+      textTransform: "none",
+      boxShadow: "0 10px 24px rgba(25, 118, 210, 0.24)",
+    }}
+    >
+    Next
+    </Button>
     </Box>
     </Stack>
     </CardContent>

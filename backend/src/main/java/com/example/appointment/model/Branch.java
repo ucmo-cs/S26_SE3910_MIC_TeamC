@@ -2,43 +2,35 @@
 package com.example.appointment.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.Objects;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "branches")
 public class Branch {
 
+    @Getter
+    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
+    @Getter
+    @Setter
     @Column(name = "name", nullable = false)
     private String name;
 
-    public Branch() {
-    }
-
-    public Branch(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    @Getter
+    @Setter
+    @Column(name = "address", nullable = false)
+    private String address;
 
     @Override
     public boolean equals(Object o) {

@@ -13,8 +13,7 @@ const STEPS = ["Location", "Reason", "Date & Time", "Personal Info", "Confirmati
 export const SchedulePage: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-
-  const { formData, updateFormData } = useAppointment(); // Use context
+  const { formData, updateFormData } = useAppointment();
 
   const API_BASE = "http://localhost:8080/api";
 
@@ -26,14 +25,12 @@ export const SchedulePage: React.FC = () => {
       if (currentStep > 0) setCurrentStep(currentStep - 1);
     };
 
-      // Centralized save function using formData from context
       const saveAppointment = async () => {
         try {
           if (!formData.startTime) {
             throw new Error("Please select a valid date and time.");
           }
 
-          // Step 1: find-or-create user
           const userRes = await fetch(`${API_BASE}/users/find-or-create`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -51,7 +48,6 @@ export const SchedulePage: React.FC = () => {
           const userData = await userRes.json();
           const userId = userData.id;
 
-          // Step 2: create appointment
           const appointmentPayload = {
             reason: formData.reason || "",
             startTime: formData.startTime,
@@ -119,17 +115,11 @@ export const SchedulePage: React.FC = () => {
         )}
 
         {currentStep === 3 && (
-          <Step4PersonalInfo
-          onNext={handleNext}
-          onPrev={handlePrev}
-          />
+          <Step4PersonalInfo onNext={handleNext} onPrev={handlePrev} />
         )}
 
         {currentStep === 4 && (
-          <Step5Confirmation
-          onPrev={handlePrev}
-          onConfirm={saveAppointment} // centralized save using context
-          />
+          <Step5Confirmation onPrev={handlePrev} onConfirm={saveAppointment} />
         )}
         </Box>
         </Container>
