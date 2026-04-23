@@ -56,7 +56,7 @@ class AppointmentServiceTest {
         Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
         Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
         testBranchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
-        testUser = userRepository.save(new User(null, "Test User", "test@example.com"));
+        testUser = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
 
         appointment = new Appointment();
         appointment.setUser(testUser);
@@ -88,7 +88,7 @@ class AppointmentServiceTest {
     void duplicate_timeslot_is_rejected() {
         appointmentService.create(appointment);
 
-        User secondUser = userRepository.save(new User(null, "Second User", "second@example.com"));
+        User secondUser = userRepository.save(new User("Second User", "seconduser", "second@example.com", "hashedpassword"));
         Appointment second = new Appointment();
         second.setUser(secondUser);
         second.setBranchTopic(testBranchTopic);

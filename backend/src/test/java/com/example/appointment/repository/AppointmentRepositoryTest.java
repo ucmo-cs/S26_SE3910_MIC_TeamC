@@ -38,7 +38,7 @@ class AppointmentRepositoryTest {
         Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
         Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
-        User user = userRepository.save(new User(null, "Test User", "test@example.com"));
+        User user = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
         Appointment entity = new Appointment(null, user, branchTopic, startTime, "Test Reason");
 
@@ -59,7 +59,7 @@ class AppointmentRepositoryTest {
         Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
         Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
-        User user = userRepository.save(new User(null, "Test User", "test@example.com"));
+        User user = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
         Appointment entity = new Appointment(null, user, branchTopic, startTime, "Test Reason");
         Appointment saved = appointmentRepository.save(entity);
@@ -78,7 +78,7 @@ class AppointmentRepositoryTest {
         Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
         Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
-        User user = userRepository.save(new User(null, "Test User", "test@example.com"));
+        User user = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
         appointmentRepository.save(new Appointment(null, user, branchTopic, startTime, "Reason1"));
         appointmentRepository.save(new Appointment(null, user, branchTopic, startTime.plusHours(1), "Reason2"));
@@ -96,7 +96,7 @@ class AppointmentRepositoryTest {
         Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
         Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
-        User user = userRepository.save(new User(null, "Test User", "test@example.com"));
+        User user = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
         appointmentRepository.save(new Appointment(null, user, branchTopic, startTime, "Test Reason"));
 
@@ -113,7 +113,7 @@ class AppointmentRepositoryTest {
         Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
         Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
-        User user = userRepository.save(new User(null, "Test User", "test@example.com"));
+        User user = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
         Appointment entity = new Appointment(null, user, branchTopic, startTime, "Test Reason");
         appointmentRepository.save(entity);
@@ -133,8 +133,8 @@ class AppointmentRepositoryTest {
         Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
         Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
-        User user1 = userRepository.save(new User(null, "User1", "user1@example.com"));
-        User user2 = userRepository.save(new User(null, "User2", "user2@example.com"));
+        User user1 = userRepository.save(new User("User1", "user1", "user1@example.com", "hashedpassword"));
+        User user2 = userRepository.save(new User("User2", "user2", "user2@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
         appointmentRepository.save(new Appointment(null, user1, branchTopic, startTime, "Reason1"));
         appointmentRepository.save(new Appointment(null, user2, branchTopic, startTime.plusHours(1), "Reason2"));

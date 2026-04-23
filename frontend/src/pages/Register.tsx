@@ -12,18 +12,26 @@ import {
 } from "@mui/material";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "@tanstack/react-router";
 
-const Login = () => {
-  const { login: authLogin, error: authError, isLoading } = useAuth();
+const Register = () => {
+  const { register: authRegister, error: authError, isLoading } = useAuth();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [usernameError, setUsernameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [nameError, setNameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   const validate = () => {
     let isValid = true;
@@ -31,8 +39,28 @@ const Login = () => {
     if (!username.trim()) {
       setUsernameError("Username is required");
       isValid = false;
+    } else if (username.length < 3) {
+      setUsernameError("Username must be at least 3 characters");
+      isValid = false;
     } else {
       setUsernameError("");
+    }
+
+    if (!email.trim()) {
+      setEmailError("Email is required");
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("Enter a valid email address");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (!name.trim()) {
+      setNameError("Name is required");
+      isValid = false;
+    } else {
+      setNameError("");
     }
 
     if (!password.trim()) {
@@ -45,23 +73,27 @@ const Login = () => {
       setPasswordError("");
     }
 
+    if (!confirmPassword.trim()) {
+      setConfirmPasswordError("Confirm password is required");
+      isValid = false;
+    } else if (password !== confirmPassword) {
+      setConfirmPasswordError("Passwords do not match");
+      isValid = false;
+    } else {
+      setConfirmPasswordError("");
+    }
+
     return isValid;
   };
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     if (validate()) {
       try {
-        await authLogin(username, password);
+        await authRegister(username, email, name, password);
         navigate({ to: "/home" });
       } catch {
-        // Error is handled by AuthContext and displayed in authError
+        // Error is handled by AuthContext
       }
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !isLoading && username && password) {
-      handleLogin();
     }
   };
 
@@ -136,7 +168,7 @@ const Login = () => {
               textAlign: "center",
             }}
           >
-            Sign in to access your banking dashboard
+            Create your banking account
           </Typography>
         </Box>
 
@@ -146,10 +178,70 @@ const Login = () => {
             fullWidth
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            onKeyPress={handleKeyPress}
             error={!!usernameError}
             helperText={usernameError}
-            placeholder="Enter your username"
+            placeholder="Choose a username"
+            variant="outlined"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "10px",
+                "&:hover fieldset": {
+                  borderColor: "#1565c0",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#1565c0",
+                  boxShadow: "0 0 0 2px rgba(21, 101, 192, 0.15)",
+                },
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonOutlineIcon sx={{ color: "#64748b" }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            label="Full Name"
+            fullWidth
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            error={!!nameError}
+            helperText={nameError}
+            placeholder="Enter your full name"
+            variant="outlined"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "10px",
+                "&:hover fieldset": {
+                  borderColor: "#1565c0",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#1565c0",
+                  boxShadow: "0 0 0 2px rgba(21, 101, 192, 0.15)",
+                },
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonOutlineIcon sx={{ color: "#64748b" }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={!!emailError}
+            helperText={emailError}
+            placeholder="Enter your email"
             variant="outlined"
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -178,7 +270,6 @@ const Login = () => {
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onKeyPress={handleKeyPress}
             error={!!passwordError}
             helperText={passwordError}
             placeholder="Enter your password"
@@ -204,19 +295,36 @@ const Login = () => {
             }}
           />
 
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: -1 }}>
-            <Link
-              href="#"
-              underline="hover"
-              sx={{
-                color: "#1565c0",
-                fontWeight: 500,
-                fontSize: "0.95rem",
-              }}
-            >
-              Forgot Password?
-            </Link>
-          </Box>
+          <TextField
+            label="Confirm Password"
+            type="password"
+            fullWidth
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            error={!!confirmPasswordError}
+            helperText={confirmPasswordError}
+            placeholder="Confirm your password"
+            variant="outlined"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "10px",
+                "&:hover fieldset": {
+                  borderColor: "#1565c0",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#1565c0",
+                  boxShadow: "0 0 0 2px rgba(21, 101, 192, 0.15)",
+                },
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockOutlinedIcon sx={{ color: "#64748b" }} />
+                </InputAdornment>
+              ),
+            }}
+          />
 
           {authError && (
             <Alert severity="error" sx={{ borderRadius: 2 }}>
@@ -227,7 +335,7 @@ const Login = () => {
           <Button
             variant="contained"
             fullWidth
-            onClick={handleLogin}
+            onClick={handleRegister}
             disabled={isLoading}
             sx={{
               mt: 1,
@@ -249,7 +357,7 @@ const Login = () => {
             {isLoading ? (
               <CircularProgress size={24} sx={{ color: "white" }} />
             ) : (
-              "Login"
+              "Create Account"
             )}
           </Button>
 
@@ -261,7 +369,8 @@ const Login = () => {
               backgroundColor: "#f8fbff",
             }}
           >
-            Your session is protected with secure banking-grade access controls.
+            Your account will be protected with secure banking-grade access
+            controls.
           </Alert>
 
           <Typography
@@ -272,16 +381,16 @@ const Login = () => {
               mt: 1,
             }}
           >
-            New to Commerce Bank?{" "}
+            Already have an account?{" "}
             <Link
-              href="/register"
+              href="/login"
               underline="hover"
               sx={{
                 color: "#1565c0",
                 fontWeight: 600,
               }}
             >
-              Create Account
+              Sign In
             </Link>
           </Typography>
         </Box>
@@ -290,4 +399,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

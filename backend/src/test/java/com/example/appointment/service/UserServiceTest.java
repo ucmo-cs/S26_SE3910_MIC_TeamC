@@ -34,7 +34,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = new User(null, "John Doe", "john@example.com");
+        testUser = new User("John Doe", "johndoe", "john@example.com", "hashedpassword");
         testUser = userRepository.save(testUser);
     }
 
@@ -42,7 +42,7 @@ class UserServiceTest {
     @DisplayName("Should save user successfully")
     void testSaveUser() {
         // Act
-        User newUser = new User(null, "Jane Doe", "jane@example.com");
+        User newUser = new User("Jane Doe", "janedoe", "jane@example.com", "hashedpassword");
         User savedUser = userService.create(newUser);
 
         // Assert
