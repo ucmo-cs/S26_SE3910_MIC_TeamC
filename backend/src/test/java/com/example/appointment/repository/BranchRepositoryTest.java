@@ -18,7 +18,7 @@ class BranchRepositoryTest {
     @Test
     void save_entity() {
         // given
-        Branch entity = new Branch(null, "Test Name");
+        Branch entity = createBranch("Test Name", "123 Test Street");
 
         // when
         Branch saved = branchRepository.save(entity);
@@ -31,7 +31,7 @@ class BranchRepositoryTest {
     @Test
     void findById_returns_correct_entity() {
         // given
-        Branch entity = new Branch(null, "Test Name");
+        Branch entity = createBranch("Test Name", "123 Test Street");
         Branch saved = branchRepository.save(entity);
 
         // when
@@ -45,8 +45,8 @@ class BranchRepositoryTest {
     @Test
     void findAll_returns_all_entities() {
         // given
-        branchRepository.save(new Branch(null, "Name1"));
-        branchRepository.save(new Branch(null, "Name2"));
+        branchRepository.save(createBranch("Name1", "Address 1"));
+        branchRepository.save(createBranch("Name2", "Address 2"));
 
         // when
         List<Branch> entities = branchRepository.findAll();
@@ -58,8 +58,8 @@ class BranchRepositoryTest {
     @Test
     void findByName_returns_matching_entities() {
         // given
-        branchRepository.save(new Branch(null, "Test Name"));
-        branchRepository.save(new Branch(null, "Other Name"));
+        branchRepository.save(createBranch("Test Name", "Address 1"));
+        branchRepository.save(createBranch("Other Name", "Address 2"));
 
         // when
         List<Branch> found = branchRepository.findByName("Test Name");
@@ -70,4 +70,11 @@ class BranchRepositoryTest {
     }
 
     // Add more tests for custom methods
+
+    private Branch createBranch(String name, String address) {
+        Branch branch = new Branch();
+        branch.setName(name);
+        branch.setAddress(address);
+        return branch;
+    }
 }

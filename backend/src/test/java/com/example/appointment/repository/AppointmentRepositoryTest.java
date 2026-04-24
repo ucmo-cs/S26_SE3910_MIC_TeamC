@@ -35,12 +35,12 @@ class AppointmentRepositoryTest {
     @Test
     void save_entity() {
         // given
-        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
-        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        Branch branch = branchRepository.save(createBranch("Test Branch"));
+        Topic topic = topicRepository.save(createTopic("Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
         User user = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
-        Appointment entity = new Appointment(null, user, branchTopic, startTime, "Test Reason");
+        Appointment entity = createAppointment(user, branchTopic, startTime, "Test Reason");
 
         // when
         Appointment saved = appointmentRepository.save(entity);
@@ -56,12 +56,12 @@ class AppointmentRepositoryTest {
     @Test
     void findById_returns_correct_entity() {
         // given
-        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
-        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        Branch branch = branchRepository.save(createBranch("Test Branch"));
+        Topic topic = topicRepository.save(createTopic("Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
         User user = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
-        Appointment entity = new Appointment(null, user, branchTopic, startTime, "Test Reason");
+        Appointment entity = createAppointment(user, branchTopic, startTime, "Test Reason");
         Appointment saved = appointmentRepository.save(entity);
 
         // when
@@ -75,13 +75,13 @@ class AppointmentRepositoryTest {
     @Test
     void findAll_returns_all_entities() {
         // given
-        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
-        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        Branch branch = branchRepository.save(createBranch("Test Branch"));
+        Topic topic = topicRepository.save(createTopic("Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
         User user = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
-        appointmentRepository.save(new Appointment(null, user, branchTopic, startTime, "Reason1"));
-        appointmentRepository.save(new Appointment(null, user, branchTopic, startTime.plusHours(1), "Reason2"));
+        appointmentRepository.save(createAppointment(user, branchTopic, startTime, "Reason1"));
+        appointmentRepository.save(createAppointment(user, branchTopic, startTime.plusHours(1), "Reason2"));
 
         // when
         List<Appointment> entities = appointmentRepository.findAll();
@@ -93,12 +93,12 @@ class AppointmentRepositoryTest {
     @Test
     void existsByBranchTopicIdAndStartTime_returns_true_when_exists() {
         // given
-        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
-        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        Branch branch = branchRepository.save(createBranch("Test Branch"));
+        Topic topic = topicRepository.save(createTopic("Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
         User user = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
-        appointmentRepository.save(new Appointment(null, user, branchTopic, startTime, "Test Reason"));
+        appointmentRepository.save(createAppointment(user, branchTopic, startTime, "Test Reason"));
 
         // when
         boolean exists = appointmentRepository.existsByBranchTopicIdAndStartTime(branchTopic.getId(), startTime);
@@ -110,12 +110,12 @@ class AppointmentRepositoryTest {
     @Test
     void findByBranchTopicIdAndStartTime_returns_correct_entity() {
         // given
-        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
-        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        Branch branch = branchRepository.save(createBranch("Test Branch"));
+        Topic topic = topicRepository.save(createTopic("Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
         User user = userRepository.save(new User("Test User", "testuser", "test@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
-        Appointment entity = new Appointment(null, user, branchTopic, startTime, "Test Reason");
+        Appointment entity = createAppointment(user, branchTopic, startTime, "Test Reason");
         appointmentRepository.save(entity);
 
         // when
@@ -130,15 +130,15 @@ class AppointmentRepositoryTest {
     @Test
     void findByUserId_returns_matching_entities() {
         // given
-        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
-        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        Branch branch = branchRepository.save(createBranch("Test Branch"));
+        Topic topic = topicRepository.save(createTopic("Test Topic"));
         BranchTopic branchTopic = branchTopicRepository.save(new BranchTopic(null, branch, topic));
         User user1 = userRepository.save(new User("User1", "user1", "user1@example.com", "hashedpassword"));
         User user2 = userRepository.save(new User("User2", "user2", "user2@example.com", "hashedpassword"));
         LocalDateTime startTime = LocalDateTime.now();
-        appointmentRepository.save(new Appointment(null, user1, branchTopic, startTime, "Reason1"));
-        appointmentRepository.save(new Appointment(null, user2, branchTopic, startTime.plusHours(1), "Reason2"));
-        appointmentRepository.save(new Appointment(null, user1, branchTopic, startTime.plusHours(2), "Reason3"));
+        appointmentRepository.save(createAppointment(user1, branchTopic, startTime, "Reason1"));
+        appointmentRepository.save(createAppointment(user2, branchTopic, startTime.plusHours(1), "Reason2"));
+        appointmentRepository.save(createAppointment(user1, branchTopic, startTime.plusHours(2), "Reason3"));
 
         // when
         List<Appointment> found = appointmentRepository.findByUserId(user1.getId());
@@ -149,4 +149,29 @@ class AppointmentRepositoryTest {
     }
 
     // Add more tests for custom methods
+
+    private Branch createBranch(String name) {
+        Branch branch = new Branch();
+        branch.setName(name);
+        branch.setAddress("123 Test Street");
+        return branch;
+    }
+
+    private Topic createTopic(String name) {
+        Topic topic = new Topic();
+        topic.setName(name);
+        topic.setDescription("Test Description");
+        topic.setIcon(1);
+        return topic;
+    }
+
+    private Appointment createAppointment(User user, BranchTopic branchTopic, LocalDateTime startTime, String reason) {
+        Appointment appointment = new Appointment();
+        appointment.setUser(user);
+        appointment.setBranchTopic(branchTopic);
+        appointment.setStartTime(startTime);
+        appointment.setReason(reason);
+        appointment.setPhoneNumber("1234567890");
+        return appointment;
+    }
 }
