@@ -14,7 +14,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
 
     private final UserService userService;
@@ -51,11 +50,5 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/find-or-create")
-    public ResponseEntity<User> findOrCreate(@RequestBody User user) {
-        User savedUser = userService.findOrCreate(user.getName(), user.getEmail());
-        return ResponseEntity.ok(savedUser);
     }
 }

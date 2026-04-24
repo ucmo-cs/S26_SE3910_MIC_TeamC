@@ -2,12 +2,7 @@
 package com.example.appointment.service;
 
 import com.example.appointment.model.Appointment;
-import com.example.appointment.model.BranchTopic;
-import com.example.appointment.model.User;
 import com.example.appointment.repository.AppointmentRepository;
-import com.example.appointment.repository.BranchTopicRepository;
-import com.example.appointment.repository.UserRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +14,13 @@ import java.util.Optional;
  * transaction boundaries in one class.
  */
 @Service
-@AllArgsConstructor
 public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
-    private final BranchTopicRepository branchTopicRepository;
-    private final UserRepository userRepository;
-    private final UserService userService;
+
+    public AppointmentService(AppointmentRepository appointmentRepository) {
+        this.appointmentRepository = appointmentRepository;
+    }
 
     @Transactional
     public Appointment create(Appointment appointment) {
@@ -35,25 +30,11 @@ public class AppointmentService {
         if (appointment.getBranchTopic() == null || appointment.getStartTime() == null) {
             throw new IllegalArgumentException("branchTopic and startTime are required");
         }
-        if (appointmentRepository.existsByBranchTopicIdAndStartTime(
-                appointment.getBranchTopic().getId(),
+        if (appointmentRepository.existsByBranchTopicIdAndStartTime(appointment.getBranchTopic().getId(),
                 appointment.getStartTime())) {
             throw new IllegalStateException("Time slot already booked");
         }
 
-        if (appointment.getBranchTopic() != null) {
-            BranchTopic branchTopic = branchTopicRepository
-                    .findById(appointment.getBranchTopic().getId())
-                    .orElseThrow();
-            appointment.setBranchTopic(branchTopic);
-        }
-
-        if (appointment.getUser() != null) {
-            User user = userRepository
-                    .findById(appointment.getUser().getId())
-                    .orElseThrow();
-            appointment.setUser(user);
-        }
         return appointmentRepository.save(appointment);
     }
 

@@ -2,51 +2,81 @@
 package com.example.appointment.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "appointments")
 public class Appointment {
 
-    @Setter
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Getter
-    @Setter
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Setter
-    @Getter
     @ManyToOne(optional = false)
     @JoinColumn(name = "branch_topic_id", nullable = false)
     private BranchTopic branchTopic;
 
-    @Getter
-    @Setter
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
-    @Setter
-    @Getter
     @Column(name = "reason", length = 500)
     private String reason;
 
-    @Setter
-    @Getter
-    @Column(name = "phone_number", length = 10, nullable = false)
-    private String phoneNumber;
+    public Appointment() {
+    }
+
+    public Appointment(Long id, User user, BranchTopic branchTopic, LocalDateTime startTime, String reason) {
+        this.id = id;
+        this.user = user;
+        this.branchTopic = branchTopic;
+        this.startTime = startTime;
+        this.reason = reason;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public BranchTopic getBranchTopic() {
+        return branchTopic;
+    }
+
+    public void setBranchTopic(BranchTopic branchTopic) {
+        this.branchTopic = branchTopic;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 
     @Override
     public boolean equals(Object o) {

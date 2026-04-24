@@ -1,74 +1,90 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import dayjs, { Dayjs } from "dayjs";
-
-interface AppointmentData {
-  reason: string;
-  branchId: number;
-  branchTopicId: number;
-  branchTopicName: string;
-  date: string;       // "YYYY-MM-DD" string from Step3
-  time: string;       // "HH:mm" string from Step3
-  startTime: string;  // ISO string "YYYY-MM-DDTHH:mm:ss" for backend
-  name: string;
-  email: string;
-  phone: string;
-}
+import React, {
+  createContext,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
+import type { Appointment, AppointmentFormData } from "../types";
 
 interface AppointmentContextType {
-  formData: AppointmentData;
-  updateFormData: (newData: Partial<AppointmentData>) => void;
-  resetFormData: () => void;
+  formData: Partial<AppointmentFormData>;
+  appointments: Appointment[];
+  setFormData: (data: Partial<AppointmentFormData>) => void;
+  updateFormData: (data: Partial<AppointmentFormData>) => void;
+  saveAppointment: (data: AppointmentFormData) => void;
+  clearFormData: () => void;
+  deleteAppointment: (id: string) => void;
 }
 
-const defaultData: AppointmentData = {
-  reason: "",
-  branchId: 0,
-  branchTopicId: 0,
-  branchTopicName: "",
-  date: "",
-  time: "",
-  startTime: "",
-  name: "",
-  email: "",
-  phone: "",
-};
+const AppointmentContext = createContext<AppointmentContextType | undefined>(
+  undefined,
+);
 
-const AppointmentContext = createContext<AppointmentContextType>({
-  formData: defaultData,
-    updateFormData: () => {},
-                                                                 resetFormData: () => {},
-});
+const STORAGE_KEY = "appointments";
 
-export const AppointmentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [formData, setFormData] = useState<AppointmentData>(defaultData);
+export const AppointmentProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const [formData, setFormDataState] = useState<Partial<AppointmentFormData>>(
+    {},
+  );
+  const [appointments, setAppointments] = useState<Appointment[]>(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  });
 
-  const updateFormData = (newData: Partial<AppointmentData>) => {
-    setFormData((prev) => {
-      const updated = { ...prev, ...newData };
-
-      // If date or time changed, automatically update startTime
-      if (newData.date || newData.time) {
-        if (updated.date && updated.time) {
-          const combined = dayjs(`${updated.date}T${updated.time}`);
-          if (combined.isValid()) {
-            updated.startTime = combined.format("YYYY-MM-DDTHH:mm:ss");
-          } else {
-            updated.startTime = "";
-          }
-        }
-      }
-
-      return updated;
-    });
+  const setFormData = (data: Partial<AppointmentFormData>) => {
+    setFormDataState(data);
   };
 
-  const resetFormData = () => setFormData(defaultData);
+  const updateFormData = (data: Partial<AppointmentFormData>) => {
+    setFormDataState((prev) => ({ ...prev, ...data }));
+  };
+
+  const saveAppointment = (data: AppointmentFormData) => {
+    const newAppointment: Appointment = {
+      id: `apt-${Date.now()}`,
+      ...data,
+      createdAt: new Date().toISOString(),
+    };
+
+    const updated = [...appointments, newAppointment];
+    setAppointments(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    setFormDataState({});
+  };
+
+  const clearFormData = () => {
+    setFormDataState({});
+  };
+
+  const deleteAppointment = (id: string) => {
+    const updated = appointments.filter((apt) => apt.id !== id);
+    setAppointments(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  };
 
   return (
-    <AppointmentContext.Provider value={{ formData, updateFormData, resetFormData }}>
-    {children}
+    <AppointmentContext.Provider
+      value={{
+        formData,
+        appointments,
+        setFormData,
+        updateFormData,
+        saveAppointment,
+        clearFormData,
+        deleteAppointment,
+      }}
+    >
+      {children}
     </AppointmentContext.Provider>
   );
 };
 
-export const useAppointment = () => useContext(AppointmentContext);
+export const useAppointment = () => {
+  const context = useContext(AppointmentContext);
+  if (!context) {
+    throw new Error("useAppointment must be used within AppointmentProvider");
+  }
+  return context;
+};
