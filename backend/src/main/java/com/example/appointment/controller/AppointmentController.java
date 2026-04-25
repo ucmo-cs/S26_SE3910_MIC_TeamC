@@ -41,13 +41,8 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Appointment>> getAll(Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(401).build();
-        }
-        User user = userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return ResponseEntity.ok(appointmentService.findByUserId(user.getId()));
+    public ResponseEntity<List<Appointment>> getAll() {
+        return ResponseEntity.ok(appointmentService.findAll());
     }
 
     @PutMapping("/{id}")

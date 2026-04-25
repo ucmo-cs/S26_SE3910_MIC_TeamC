@@ -218,7 +218,8 @@ export const TopBar: React.FC = () => {
           }}
         >
           <MenuItem disabled sx={{ color: "rgba(0,0,0,0.6)" }}>
-            Signed in as <strong>{` ${currentUser?.name}`}</strong>
+            Signed in as&nbsp;
+            <strong>{`${currentUser?.name}`}</strong>
           </MenuItem>
           <Divider />
           <MenuItem onClick={handleLogout} sx={{ color: "#d32f2f" }}>
