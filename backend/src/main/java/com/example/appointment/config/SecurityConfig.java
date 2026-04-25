@@ -91,16 +91,19 @@ public class SecurityConfig {
                     .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/auth/me")
                     .permitAll()
                         .requestMatchers("/api/branches", "/api/branches/**").permitAll()
+                        .requestMatchers("/api/topics", "/api/topics/**").permitAll()
+                        .requestMatchers("/api/branchtopics", "/api/branchtopics/**").permitAll()
+                        .requestMatchers("/api/branchtimes", "/api/branchtimes/**").permitAll()
+                        .requestMatchers("/api/users", "/api/users/**").permitAll()
                         .requestMatchers("/h2-console", "/h2-console/**").permitAll()
+                    // Public appointment endpoints
+                        .requestMatchers("/api/appointments/taken-slots").permitAll()
                     // Protected endpoints
                         .requestMatchers("/api/appointments", "/api/appointments/**").authenticated()
-                        .requestMatchers("/api/users", "/api/users/**").permitAll()
                         // All other requests require authentication
                         .anyRequest().authenticated())
                 // Configure login/logout
-                .httpBasic(httpBasic -> {
-                    // httpBasic is kept for debugging; in production, disable this
-                })
+                .httpBasic(httpBasic -> httpBasic.disable())  // Disable Basic auth for public endpoints
                 .logout(logout -> logout
                     // Keep Spring Security logout on a separate path so AuthController
                     // can own /api/auth/logout and return the API response payload.

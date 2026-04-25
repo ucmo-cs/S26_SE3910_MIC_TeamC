@@ -2,10 +2,13 @@
 package com.example.appointment.controller;
 
 import com.example.appointment.model.Appointment;
+import com.example.appointment.model.User;
+import com.example.appointment.repository.UserRepository;
 import com.example.appointment.service.AppointmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -16,13 +19,14 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/appointments")
-@CrossOrigin(origins = "http://localhost:5173")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
+    private final UserRepository userRepository;
 
-    public AppointmentController(AppointmentService appointmentService) {
+    public AppointmentController(AppointmentService appointmentService, UserRepository userRepository) {
         this.appointmentService = appointmentService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
@@ -37,8 +41,13 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Appointment>> getAll() {
-        return ResponseEntity.ok(appointmentService.findAll());
+    public ResponseEntity<List<Appointment>> getAll(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(401).build();
+        }
+        User user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return ResponseEntity.ok(appointmentService.findByUserId(user.getId()));
     }
 
     @PutMapping("/{id}")

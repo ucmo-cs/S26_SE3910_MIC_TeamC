@@ -22,7 +22,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/branchtimes")
-@CrossOrigin(origins = "http://localhost:5173")
 public class BranchTimeController {
 
     private final BranchTimeService branchTimeService;

@@ -10,9 +10,13 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,10 +39,23 @@ public class AuthController {
      * @return UserResponse with created user data
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request, HttpSession session) {
         try {
             User user = authService.register(request.getUsername(), request.getEmail(), request.getName(),
                     request.getPassword());
+            
+            // Manually authenticate the user in Spring Security
+            UsernamePasswordAuthenticationToken token = 
+                new UsernamePasswordAuthenticationToken(
+                    user.getUsername(), 
+                    null, 
+                    List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                );
+            SecurityContextHolder.getContext().setAuthentication(token);
+            
+            // Persist the SecurityContext to the session
+            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+            
             UserResponse response = UserResponse.fromUser(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException e) {
@@ -57,8 +74,19 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpSession session) {
         Optional<User> user = authService.authenticate(request.getUsername(), request.getPassword());
         if (user.isPresent()) {
-            // Spring Security automatically creates session after successful authentication
-            // We'll set the user in session for retrieval
+            // Manually authenticate the user in Spring Security
+            UsernamePasswordAuthenticationToken token = 
+                new UsernamePasswordAuthenticationToken(
+                    user.get().getUsername(), 
+                    null, 
+                    List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                );
+            SecurityContextHolder.getContext().setAuthentication(token);
+            
+            // Persist the SecurityContext to the session
+            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+            
+            // Also set in session for reference
             session.setAttribute("userId", user.get().getId());
             session.setAttribute("username", user.get().getUsername());
             UserResponse response = UserResponse.fromUser(user.get());

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -15,11 +15,23 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 
 const Register = () => {
-  const { register: authRegister, error: authError, isLoading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const {
+    register: authRegister,
+    error: authError,
+    isLoading,
+    isLoggedIn,
+  } = useAuth();
+
+  // Redirect to home if already logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.navigate({ to: "/home" });
+    }
+  }, [isLoggedIn, router]);
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -90,7 +102,8 @@ const Register = () => {
     if (validate()) {
       try {
         await authRegister(username, email, name, password);
-        navigate({ to: "/home" });
+        // Navigate using React Router (no full page reload)
+        await router.navigate({ to: "/home" });
       } catch {
         // Error is handled by AuthContext
       }

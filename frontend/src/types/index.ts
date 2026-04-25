@@ -1,5 +1,5 @@
 export interface Appointment {
-  id: string;
+  id: number;
   reason: string;
   location: string;
   date: string; // ISO date string (YYYY-MM-DD)
@@ -7,6 +7,7 @@ export interface Appointment {
   name: string;
   email: string;
   phone: string;
+  topic: string;
   createdAt: string; // ISO timestamp
 }
 

@@ -4,11 +4,12 @@ import dayjs, { Dayjs } from "dayjs";
 interface AppointmentData {
   reason: string;
   branchId: number;
+  branchName: string;
   branchTopicId: number;
   branchTopicName: string;
-  date: string;       // "YYYY-MM-DD" string from Step3
-  time: string;       // "HH:mm" string from Step3
-  startTime: string;  // ISO string "YYYY-MM-DDTHH:mm:ss" for backend
+  date: string; // "YYYY-MM-DD" string from Step3
+  time: string; // "HH:mm" string from Step3
+  startTime: string; // ISO string "YYYY-MM-DDTHH:mm:ss" for backend
   name: string;
   email: string;
   phone: string;
@@ -23,6 +24,7 @@ interface AppointmentContextType {
 const defaultData: AppointmentData = {
   reason: "",
   branchId: 0,
+  branchName: "",
   branchTopicId: 0,
   branchTopicName: "",
   date: "",
@@ -35,11 +37,13 @@ const defaultData: AppointmentData = {
 
 const AppointmentContext = createContext<AppointmentContextType>({
   formData: defaultData,
-    updateFormData: () => {},
-                                                                 resetFormData: () => {},
+  updateFormData: () => {},
+  resetFormData: () => {},
 });
 
-export const AppointmentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AppointmentProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [formData, setFormData] = useState<AppointmentData>(defaultData);
 
   const updateFormData = (newData: Partial<AppointmentData>) => {
@@ -65,8 +69,10 @@ export const AppointmentProvider: React.FC<{ children: ReactNode }> = ({ childre
   const resetFormData = () => setFormData(defaultData);
 
   return (
-    <AppointmentContext.Provider value={{ formData, updateFormData, resetFormData }}>
-    {children}
+    <AppointmentContext.Provider
+      value={{ formData, updateFormData, resetFormData }}
+    >
+      {children}
     </AppointmentContext.Provider>
   );
 };

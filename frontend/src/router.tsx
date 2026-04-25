@@ -4,6 +4,7 @@ import {
   Router,
   Outlet,
   Navigate,
+  useNavigate,
 } from "@tanstack/react-router";
 import { TopBar } from "./components/TopBar";
 import { HomePage } from "./routes/HomePage";
@@ -16,14 +17,14 @@ import { useEffect } from "react";
 
 // Protected route component - redirects to login if not authenticated
 const ProtectedLayout = () => {
+  const navigate = useNavigate();
   const { isLoggedIn, isLoading } = useAuth();
-  const navigate = useAuth();
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
-      window.location.href = "/login";
+      navigate({ to: "/login" });
     }
-  }, [isLoggedIn, isLoading]);
+  }, [isLoggedIn, isLoading, navigate]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -58,9 +59,44 @@ const ProtectedLayout = () => {
   );
 };
 
-// Public layout for login/register
+// Public layout for login/register - redirects authenticated users to home
 const PublicLayout = () => {
+  const navigate = useNavigate();
+  const { isLoggedIn, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && isLoggedIn) {
+      navigate({ to: "/home" });
+    }
+  }, [isLoggedIn, isLoading, navigate]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return <Outlet />;
+};
+
+// Root redirect - sends unauthenticated users to login, authenticated to home
+const RootRedirect = () => {
+  const navigate = useNavigate();
+  const { isLoggedIn, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (isLoggedIn) {
+        navigate({ to: "/home" });
+      } else {
+        navigate({ to: "/login" });
+      }
+    }
+  }, [isLoggedIn, isLoading, navigate]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return null;
 };
 
 const RootComponent = () => {
@@ -74,17 +110,7 @@ const RootComponent = () => {
         minHeight: "100vh",
       }}
     >
-      <TopBar />
-      <div
-        style={{
-          flex: 1,
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Outlet />
-      </div>
+      <Outlet />
     </div>
   );
 };
@@ -93,21 +119,23 @@ const rootRoute = new RootRoute({
   component: RootComponent,
 });
 
-// Public auth routes
-const publicRoute = new Route({
+// Root index route - redirects based on auth
+const rootIndexRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: PublicLayout,
+  component: RootRedirect,
 });
 
+// Login route
 const loginRoute = new Route({
-  getParentRoute: () => publicRoute,
+  getParentRoute: () => rootRoute,
   path: "/login",
   component: Login,
 });
 
+// Register route with public layout
 const registerRoute = new Route({
-  getParentRoute: () => publicRoute,
+  getParentRoute: () => rootRoute,
   path: "/register",
   component: Register,
 });
@@ -144,7 +172,9 @@ const scheduleWildcardRoute = new Route({
 });
 
 const routeTree = rootRoute.addChildren([
-  publicRoute.addChildren([loginRoute, registerRoute]),
+  rootIndexRoute,
+  loginRoute,
+  registerRoute,
   protectedRoute.addChildren([
     indexRoute,
     scheduleRoute,

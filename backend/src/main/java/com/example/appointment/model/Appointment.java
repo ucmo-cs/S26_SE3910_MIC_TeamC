@@ -11,40 +11,30 @@ import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "appointments")
 public class Appointment {
 
-    @Setter
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Getter
-    @Setter
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Setter
-    @Getter
     @ManyToOne(optional = false)
     @JoinColumn(name = "branch_topic_id", nullable = false)
     private BranchTopic branchTopic;
 
-    @Getter
-    @Setter
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
-    @Setter
-    @Getter
     @Column(name = "reason", length = 500)
     private String reason;
 
-    @Setter
-    @Getter
     @Column(name = "phone_number", length = 10, nullable = false)
     private String phoneNumber;
 

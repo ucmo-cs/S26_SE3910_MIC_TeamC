@@ -13,9 +13,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCU] = useState<User | null>(null);
+  const setCurrentUser = (newUser: User | null) => {
+    console.log("value", newUser);
+    setCU(newUser);
+  };
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // TODO: remove
+  useEffect(() => {
+    console.log("current user", currentUser);
+  }, [currentUser]);
 
   // Check if user is already logged in on mount
   useEffect(() => {
@@ -23,9 +32,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       try {
         const user = await authService.getCurrentUser();
         setCurrentUser(user);
+        localStorage.setItem("user", JSON.stringify(user));
       } catch {
-        // User is not authenticated, which is fine
-        setCurrentUser(null);
+        // Try localStorage as fallback for session recovery
+        const cached = localStorage.getItem("user");
+        if (cached) {
+          try {
+            setCurrentUser(JSON.parse(cached));
+          } catch {
+            // Invalid cached data, clear it
+            localStorage.removeItem("user");
+            setCurrentUser(null);
+          }
+        } else {
+          setCurrentUser(null);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -39,8 +60,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setError(null);
     try {
       const user = await authService.login(username, password);
+      console.log("user", user);
       setCurrentUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
     } catch (err) {
+      localStorage.removeItem("user");
       const errorMessage = err instanceof Error ? err.message : "Login failed";
       setError(errorMessage);
       throw err;
@@ -59,8 +83,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setError(null);
     try {
       const user = await authService.register(username, email, name, password);
+      console.log("user", user);
       setCurrentUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
     } catch (err) {
+      localStorage.removeItem("user");
       const errorMessage =
         err instanceof Error ? err.message : "Registration failed";
       setError(errorMessage);
@@ -76,6 +103,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       await authService.logout();
       setCurrentUser(null);
+      localStorage.removeItem("user");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Logout failed";
       setError(errorMessage);

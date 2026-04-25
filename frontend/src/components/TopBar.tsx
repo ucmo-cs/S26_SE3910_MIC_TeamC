@@ -7,15 +7,24 @@ import {
   MenuItem,
   Box,
   Button,
+  Divider,
 } from "@mui/material";
 import { useNavigate } from "@tanstack/react-router";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useAuth } from "../context/AuthContext";
 
 export const TopBar: React.FC = () => {
   const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(
+    null,
+  );
   const open = Boolean(anchorEl);
+  const userMenuOpen = Boolean(userMenuAnchorEl);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -25,18 +34,42 @@ export const TopBar: React.FC = () => {
     setAnchorEl(null);
   };
 
+  const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setUserMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setUserMenuAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    handleUserMenuClose();
+    await logout();
+    window.location.href = "/login";
+  };
+
+  const handleLoginClick = () => {
+    navigate({ to: "/login" });
+    handleMenuClose();
+  };
+
+  const handleRegisterClick = () => {
+    navigate({ to: "/register" });
+    handleMenuClose();
+  };
+
   const handleHomeClick = () => {
     navigate({ to: "/" });
     handleMenuClose();
   };
 
   const handleSchedule = () => {
-    navigate({ to: "/schedule/step1" });
+    navigate({ to: "/home/schedule/step1" });
     handleMenuClose();
   };
 
   const handleAppointments = () => {
-    navigate({ to: "/appointments" });
+    navigate({ to: "/home/appointments" });
     handleMenuClose();
   };
 
@@ -86,34 +119,69 @@ export const TopBar: React.FC = () => {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <Button
-            onClick={handleHomeClick}
-            color="inherit"
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              "&:hover": {
-                backgroundColor: "rgba(255,255,255,0.12)",
-              },
-            }}
-          >
-            Home
-          </Button>
+          {currentUser ? (
+            <>
+              <Button
+                onClick={handleMenuOpen}
+                color="inherit"
+                startIcon={<MenuIcon />}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.12)",
+                  },
+                }}
+              >
+                Menu
+              </Button>
 
-          <Button
-            onClick={handleMenuOpen}
-            color="inherit"
-            startIcon={<MenuIcon />}
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              "&:hover": {
-                backgroundColor: "rgba(255,255,255,0.12)",
-              },
-            }}
-          >
-            Menu
-          </Button>
+              <Button
+                onClick={handleUserMenuOpen}
+                color="inherit"
+                startIcon={<AccountCircleIcon />}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.12)",
+                  },
+                }}
+              >
+                {currentUser.username}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                onClick={handleLoginClick}
+                color="inherit"
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.12)",
+                  },
+                }}
+              >
+                Login
+              </Button>
+
+              <Button
+                onClick={handleRegisterClick}
+                color="inherit"
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.12)",
+                  },
+                }}
+              >
+                Register
+              </Button>
+            </>
+          )}
         </Box>
 
         <Menu
@@ -133,6 +201,30 @@ export const TopBar: React.FC = () => {
           <MenuItem onClick={handleHomeClick}>Home</MenuItem>
           <MenuItem onClick={handleSchedule}>Schedule Appointment</MenuItem>
           <MenuItem onClick={handleAppointments}>View Appointments</MenuItem>
+        </Menu>
+
+        <Menu
+          anchorEl={userMenuAnchorEl}
+          open={userMenuOpen}
+          onClose={handleUserMenuClose}
+          PaperProps={{
+            elevation: 4,
+            sx: {
+              mt: 1,
+              borderRadius: 2,
+              minWidth: 200,
+              boxShadow: "0 10px 30px rgba(15, 23, 42, 0.12)",
+            },
+          }}
+        >
+          <MenuItem disabled sx={{ color: "rgba(0,0,0,0.6)" }}>
+            Signed in as <strong>{` ${currentUser?.name}`}</strong>
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleLogout} sx={{ color: "#d32f2f" }}>
+            <LogoutIcon sx={{ mr: 1, fontSize: 20 }} />
+            Logout
+          </MenuItem>
         </Menu>
       </Toolbar>
     </AppBar>
