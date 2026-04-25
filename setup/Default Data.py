@@ -1,9 +1,41 @@
 import requests
 
 BASE_URL = "http://localhost:8080/api"
+session = requests.Session()
+
+# Register/login admin user
+print("Setting up authentication...")
+try:
+    login = session.post(f"{BASE_URL}/auth/login", json={"username": "admin", "password": "admin1234"})
+    if login.status_code == 401:
+        reg = session.post(f"{BASE_URL}/auth/register", json={
+            "username": "admin", "email": "admin@example.com", "name": "Admin", "password": "admin1234"
+        })
+        print("Registered admin user")
+        session.post(f"{BASE_URL}/auth/login", json={"username": "admin", "password": "admin1234"})
+    
+    # Verify authentication
+    me = session.get(f"{BASE_URL}/auth/me")
+    print(f"Auth /me response status: {me.status_code}")
+    print(f"Session cookies after login: {session.cookies}")
+    print(f"Auth headers: {session.headers}")
+    if me.status_code == 200:
+        print(f"Authenticated as: {me.json()}")
+    else:
+        print(f"Authentication verification failed: {me.status_code}")
+        print(f"Response: {me.text}")
+    
+    print("Authenticated successfully")
+except Exception as e:
+    print(f"Auth failed: {e}")
 
 def post(endpoint, data):
-    response = requests.post(f"{BASE_URL}/{endpoint}", json=data)
+    response = session.post(f"{BASE_URL}/{endpoint}", json=data)
+    if response.status_code >= 400:
+        print(f"Error posting to {endpoint} - Status {response.status_code}")
+        print(f"Request data: {data}")
+        print(f"Response: {response.text}")
+        print(f"Session cookies: {session.cookies}")
     response.raise_for_status()
     return response.json()
 
@@ -42,21 +74,12 @@ post("branchtopics", { "branch": { "id": branch4['id'] }, "topic": { "id": topic
 post("branchtopics", { "branch": { "id": branch4['id'] }, "topic": { "id": topic5['id'] } })
 
 # Create example users
-user1 = post("users", {"name": "Keelan Schmidt", "email": "example@gmail.com"})
-user2 = post("users", {"name": "John Smith", "email": "j.test2@gmail.com"})
+user1 = post("users/find-or-create", {"name": "Keelan Schmidt", "email": "example@gmail.com"})
+user2 = post("users/find-or-create", {"name": "John Smith", "email": "j.test2@gmail.com"})
 
-# Create example appointments
-post("appointments", {"user": {"id": user1['id']},"branchTopic": {"id": branchTopic1['id']},
-        "startTime": "2026-04-30T13:30:00",
-        "reason": "I would like to open a new account and transfer from my previous account with another bank.",
-        "phoneNumber": "1234567890"
-    })
-
-post("appointments", {"user": {"id": user2['id']},"branchTopic": {"id": branchTopic6['id']},
-        "startTime": "2026-04-30T13:00:00",
-        "reason": "Applying for new credit card.",
-        "phoneNumber": "1112223333"
-    })
+# Create appointments
+post("appointments", {"user": {"id": user1['id']}, "branchTopic": {"id": branchTopic1['id']}, "startTime": "2024-01-15T09:00:00", "phoneNumber": "1234567890"})
+post("appointments", {"user": {"id": user2['id']}, "branchTopic": {"id": branchTopic6['id']}, "startTime": "2024-01-16T10:30:00", "phoneNumber": "1234567891"})
 
 # Seed branch times
 post("branchtimes/bulk", [

@@ -11,24 +11,20 @@ import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "branches")
 public class Branch {
 
-    @Getter
-    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
-    @Getter
-    @Setter
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Getter
-    @Setter
     @Column(name = "address", nullable = false)
     private String address;
 

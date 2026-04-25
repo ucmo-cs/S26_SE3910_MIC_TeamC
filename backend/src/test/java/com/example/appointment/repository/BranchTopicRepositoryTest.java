@@ -26,8 +26,8 @@ class BranchTopicRepositoryTest {
     @Test
     void save_entity() {
         // given
-        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
-        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        Branch branch = branchRepository.save(createBranch("Test Branch", "123 Test Street"));
+        Topic topic = topicRepository.save(createTopic("Test Topic", "Test Description", 1));
         BranchTopic entity = new BranchTopic(null, branch, topic);
 
         // when
@@ -42,8 +42,8 @@ class BranchTopicRepositoryTest {
     @Test
     void findById_returns_correct_entity() {
         // given
-        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
-        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        Branch branch = branchRepository.save(createBranch("Test Branch", "123 Test Street"));
+        Topic topic = topicRepository.save(createTopic("Test Topic", "Test Description", 1));
         BranchTopic entity = new BranchTopic(null, branch, topic);
         BranchTopic saved = branchTopicRepository.save(entity);
 
@@ -58,8 +58,8 @@ class BranchTopicRepositoryTest {
     @Test
     void findAll_returns_all_entities() {
         // given
-        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
-        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        Branch branch = branchRepository.save(createBranch("Test Branch", "123 Test Street"));
+        Topic topic = topicRepository.save(createTopic("Test Topic", "Test Description", 1));
         branchTopicRepository.save(new BranchTopic(null, branch, topic));
         branchTopicRepository.save(new BranchTopic(null, branch, topic));
 
@@ -73,9 +73,9 @@ class BranchTopicRepositoryTest {
     @Test
     void findByBranchId_returns_matching_entities() {
         // given
-        Branch branch1 = branchRepository.save(new Branch(null, "Branch1"));
-        Branch branch2 = branchRepository.save(new Branch(null, "Branch2"));
-        Topic topic = topicRepository.save(new Topic(null, "Test Topic"));
+        Branch branch1 = branchRepository.save(createBranch("Branch1", "Address 1"));
+        Branch branch2 = branchRepository.save(createBranch("Branch2", "Address 2"));
+        Topic topic = topicRepository.save(createTopic("Test Topic", "Test Description", 1));
         branchTopicRepository.save(new BranchTopic(null, branch1, topic));
         branchTopicRepository.save(new BranchTopic(null, branch2, topic));
 
@@ -90,9 +90,9 @@ class BranchTopicRepositoryTest {
     @Test
     void findByTopicId_returns_matching_entities() {
         // given
-        Branch branch = branchRepository.save(new Branch(null, "Test Branch"));
-        Topic topic1 = topicRepository.save(new Topic(null, "Topic1"));
-        Topic topic2 = topicRepository.save(new Topic(null, "Topic2"));
+        Branch branch = branchRepository.save(createBranch("Test Branch", "123 Test Street"));
+        Topic topic1 = topicRepository.save(createTopic("Topic1", "Description 1", 1));
+        Topic topic2 = topicRepository.save(createTopic("Topic2", "Description 2", 2));
         branchTopicRepository.save(new BranchTopic(null, branch, topic1));
         branchTopicRepository.save(new BranchTopic(null, branch, topic2));
 
@@ -105,4 +105,19 @@ class BranchTopicRepositoryTest {
     }
 
     // Add more tests for custom methods
+
+    private Branch createBranch(String name, String address) {
+        Branch branch = new Branch();
+        branch.setName(name);
+        branch.setAddress(address);
+        return branch;
+    }
+
+    private Topic createTopic(String name, String description, int icon) {
+        Topic topic = new Topic();
+        topic.setName(name);
+        topic.setDescription(description);
+        topic.setIcon(icon);
+        return topic;
+    }
 }

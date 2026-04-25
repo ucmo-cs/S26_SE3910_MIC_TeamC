@@ -18,7 +18,7 @@ class TopicRepositoryTest {
     @Test
     void save_entity() {
         // given
-        Topic entity = new Topic(null, "Test Name");
+        Topic entity = createTopic("Test Name", "Test Description", 1);
 
         // when
         Topic saved = topicRepository.save(entity);
@@ -31,7 +31,7 @@ class TopicRepositoryTest {
     @Test
     void findById_returns_correct_entity() {
         // given
-        Topic entity = new Topic(null, "Test Name");
+        Topic entity = createTopic("Test Name", "Test Description", 1);
         Topic saved = topicRepository.save(entity);
 
         // when
@@ -45,8 +45,8 @@ class TopicRepositoryTest {
     @Test
     void findAll_returns_all_entities() {
         // given
-        topicRepository.save(new Topic(null, "Name1"));
-        topicRepository.save(new Topic(null, "Name2"));
+        topicRepository.save(createTopic("Name1", "Description 1", 1));
+        topicRepository.save(createTopic("Name2", "Description 2", 2));
 
         // when
         List<Topic> entities = topicRepository.findAll();
@@ -58,8 +58,8 @@ class TopicRepositoryTest {
     @Test
     void findByName_returns_matching_entities() {
         // given
-        topicRepository.save(new Topic(null, "Test Name"));
-        topicRepository.save(new Topic(null, "Other Name"));
+        topicRepository.save(createTopic("Test Name", "Description 1", 1));
+        topicRepository.save(createTopic("Other Name", "Description 2", 2));
 
         // when
         List<Topic> found = topicRepository.findByName("Test Name");
@@ -70,4 +70,12 @@ class TopicRepositoryTest {
     }
 
     // Add more tests for custom methods
+
+    private Topic createTopic(String name, String description, int icon) {
+        Topic topic = new Topic();
+        topic.setName(name);
+        topic.setDescription(description);
+        topic.setIcon(icon);
+        return topic;
+    }
 }

@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, Container, Typography, Button, Stack, Paper } from "@mui/material";
+import {
+  Box,
+  Container,
+  Typography,
+  Button,
+  Stack,
+  Paper,
+} from "@mui/material";
 import { useNavigate } from "@tanstack/react-router";
 
 export const HomePage: React.FC = () => {
@@ -78,7 +85,7 @@ export const HomePage: React.FC = () => {
             <Button
               variant="contained"
               size="large"
-              onClick={() => navigate({ to: "/schedule/step1" })}
+              onClick={() => navigate({ to: "/home/schedule/step1" })}
               sx={{
                 px: 4,
                 py: 1.5,
@@ -100,7 +107,7 @@ export const HomePage: React.FC = () => {
             <Button
               variant="outlined"
               size="large"
-              onClick={() => navigate({ to: "/appointments" })}
+              onClick={() => navigate({ to: "/home/appointments" })}
               sx={{
                 px: 4,
                 py: 1.5,

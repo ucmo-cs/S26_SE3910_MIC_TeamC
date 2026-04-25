@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -49,6 +50,21 @@ public class UserService {
         User u = new User();
         u.setName(name);
         u.setEmail(email);
+        // Required DB columns for local users: create a deterministic username and
+        // a non-null placeholder password for externally provisioned users.
+        u.setUsername(buildUniqueUsername(email));
+        u.setPassword("EXTERNAL_AUTH_USER");
         return repository.save(u);
+    }
+
+    private String buildUniqueUsername(String email) {
+        String base = email;
+        String candidate = base;
+
+        while (repository.findByUsername(candidate).isPresent()) {
+            candidate = base + "_" + UUID.randomUUID().toString().substring(0, 8);
+        }
+
+        return candidate;
     }
 }
