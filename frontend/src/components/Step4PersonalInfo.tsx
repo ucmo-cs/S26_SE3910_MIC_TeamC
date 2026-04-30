@@ -18,7 +18,9 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useAppointment } from "../context/AppointmentContext";
+import { useAuth } from "../context/AuthContext";
 
 interface Step4Props {
   onNext: () => void;
@@ -30,9 +32,21 @@ export const Step4PersonalInfo: React.FC<Step4Props> = ({
   onPrev,
 }) => {
   const { formData, updateFormData } = useAppointment();
+  const { currentUser } = useAuth();
 
-  const [localName, setLocalName] = useState(formData.name || "");
-  const [localEmail, setLocalEmail] = useState(formData.email || "");
+  // A field is "auth-locked" only if the auth data is non-empty for that field.
+  const authName = currentUser?.name?.trim() || "";
+  const authEmail = currentUser?.email?.trim() || "";
+
+  const nameFromAuth = authName.length > 0;
+  const emailFromAuth = authEmail.length > 0;
+
+  const [localName, setLocalName] = useState(
+    nameFromAuth ? authName : formData.name || ""
+  );
+  const [localEmail, setLocalEmail] = useState(
+    emailFromAuth ? authEmail : formData.email || ""
+  );
   const [localPhone, setLocalPhone] = useState(formData.phone || "");
   const [localNotes, setLocalNotes] = useState(formData.reason || "");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -67,7 +81,7 @@ export const Step4PersonalInfo: React.FC<Step4Props> = ({
       updateFormData({
         name: localName,
         email: localEmail,
-        phone: localPhone.replace(/\D/g, ""), // strip non-digits before saving
+        phone: localPhone.replace(/\D/g, ""),
                      reason: localNotes,
       });
       onNext();
@@ -162,7 +176,15 @@ export const Step4PersonalInfo: React.FC<Step4Props> = ({
     </Typography>
     </Box>
 
-    <Box sx={{ minWidth: 220, minHeight: 32, display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <Box
+    sx={{
+      minWidth: 220,
+      minHeight: 32,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+    >
     {allFilled ? (
       <Chip
       icon={<CheckCircleOutlineOutlinedIcon />}
@@ -188,10 +210,15 @@ export const Step4PersonalInfo: React.FC<Step4Props> = ({
     <TextField
     label="Full Name"
     value={localName}
-    onChange={(e) => setLocalName(e.target.value)}
+    onChange={nameFromAuth ? undefined : (e) => setLocalName(e.target.value)}
     fullWidth
+    disabled={nameFromAuth}
     error={!!errors.name}
-    helperText={errors.name}
+    helperText={
+      nameFromAuth
+      ? "Pulled from your account"
+      : errors.name
+    }
     placeholder="Enter your full name"
     InputProps={{
       startAdornment: (
@@ -199,6 +226,11 @@ export const Step4PersonalInfo: React.FC<Step4Props> = ({
         <PersonOutlineOutlinedIcon sx={{ color: "#64748B" }} />
         </InputAdornment>
       ),
+      endAdornment: nameFromAuth ? (
+        <InputAdornment position="end">
+        <LockOutlinedIcon sx={{ color: "#94A3B8", fontSize: 18 }} />
+        </InputAdornment>
+      ) : undefined,
     }}
     />
 
@@ -206,10 +238,15 @@ export const Step4PersonalInfo: React.FC<Step4Props> = ({
     label="Email Address"
     type="email"
     value={localEmail}
-    onChange={(e) => setLocalEmail(e.target.value)}
+    onChange={emailFromAuth ? undefined : (e) => setLocalEmail(e.target.value)}
     fullWidth
+    disabled={emailFromAuth}
     error={!!errors.email}
-    helperText={errors.email}
+    helperText={
+      emailFromAuth
+      ? "Pulled from your account"
+      : errors.email
+    }
     placeholder="name@example.com"
     InputProps={{
       startAdornment: (
@@ -217,6 +254,11 @@ export const Step4PersonalInfo: React.FC<Step4Props> = ({
         <EmailOutlinedIcon sx={{ color: "#64748B" }} />
         </InputAdornment>
       ),
+      endAdornment: emailFromAuth ? (
+        <InputAdornment position="end">
+        <LockOutlinedIcon sx={{ color: "#94A3B8", fontSize: 18 }} />
+        </InputAdornment>
+      ) : undefined,
     }}
     />
 
